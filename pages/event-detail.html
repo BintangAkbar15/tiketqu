@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Event - Tiketqu</title>
+    <link rel="stylesheet" href="../css/detail.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        /* Mencegah grid column melebar tanpa batas (blowout) pada kolom kiri */
+        .main-content-left {
+            min-width: 0; 
+            max-width: 100%;
+        }
+
+        /* Container scroll horizontal untuk event serupa & lainnya */
+        .horizontal-scroll-wrapper {
+            display: flex;
+            gap: 20px;
+            overflow-x: scroll;
+            padding-bottom: 20px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            width: 100%; 
+        }
+
+        /* Menyembunyikan scrollbar agar tampilan lebih bersih, tapi tetap bisa digeser */
+        .horizontal-scroll-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Penyesuaian card agar ukurannya konsisten dan tidak terlalu lebar */
+        .recommendation-card {
+            background: #ffffff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(0, 81, 139, 0.105);
+            display: flex;
+            flex-direction: column;
+            flex: 0 0 260px; /* Lebar tetap card: 260px */
+            max-width: 260px;
+            scroll-snap-align: start;
+            transition: transform 0.3s ease;
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .rec-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .rec-footer {
+            margin-top: auto;
+            border-top: 1px solid #eee;
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-icon-align {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .section-spacing {
+            padding: 20px 0 10px 0;
+        }
+
+        /* Kontainer khusus bawah untuk melebar penuh 1200px */
+        .full-width-recommendation {
+            max-width: 1200px;
+            margin: 40px auto 0 auto;
+            width: 100%;
+        }
+
+        
+        iframe{
+            width: 100%;
+            height: 370px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="breadcrumb-container">
+        <a href="katalog.html" class="btn-back">
+            <span class="material-icons" style="font-size: 18px;">arrow_back</span> Kembali ke Katalog
+        </a>
+    </div>
+
+    <div class="detail-layout-container">
+        <div class="main-content-left">
+            <div class="event-header-block scroll-reveal">
+                <span class="badge-category" id="event-category" style="text-transform: capitalize;">Memuat...</span>
+                <h1 id="event-title">Memuat judul...</h1>
+                <p class="organized-by">Diselenggarakan oleh: <strong id="event-organizer">-</strong></p>
+            </div>
+
+            <div class="event-meta-cards scroll-reveal">
+                <div class="meta-card">
+                    <span class="meta-icon"><span class="material-icons">calendar_today</span></span>
+                    <div class="meta-text">
+                        <h4>Tanggal & Waktu</h4>
+                        <p id="event-date">-</p>
+                        <p class="sub-meta" id="event-time">-</p>
+                    </div>
+                </div>
+                <div class="meta-card">
+                    <span class="meta-icon"><span class="material-icons">location_on</span></span>
+                    <div class="meta-text">
+                        <h4>Lokasi Acara</h4>
+                        <p id="event-location">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="description-section scroll-reveal">
+                <h2>Tentang Event</h2>
+                <p id="event-description">Memuat deskripsi...</p>
+            </div>
+        </div> 
+
+        <div class="sticky-sidebar-right">
+            <div class="sticky-ticket-box scroll-reveal">
+                <div class="ticket-image-banner">
+                    <img src="" id="event-banner" alt="Event Banner">
+                </div>
+                
+                <div class="ticket-pricing-body">
+                    <div class="price-row">
+                        <span class="price-label">Harga Tiket</span>
+                        <h2 class="price-value" id="price-value">Rp 0</h2>
+                    </div>
+                    
+                    <div class="quantity-selector-block">
+                        <span class="qty-label">Jumlah Tiket</span>
+                        <div class="qty-controls">
+                            <button class="qty-btn minus">-</button>
+                            <input type="number" class="qty-input" id="qty-input" value="1" min="1" max="10" readonly>
+                            <button class="qty-btn plus">+</button>
+                        </div>
+                    </div>
+
+                    <div class="total-payment-row">
+                        <span>Total Pembayaran</span>
+                        <strong id="total-price-display">Rp 0</strong>
+                    </div>
+
+                    <div class="action-buttons-group" id="action-buttons-container">
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div> <div class="full-width-recommendation">
+        <div class="section-spacing scroll-reveal" id="recommendation-section" style="display: none;">
+            <div class="recommendation-header" style="margin-bottom: 20px;">
+                <h2 style="font-size: 1.5rem; color: var(--dark-color, #16425e); font-weight: 700;">Event Serupa</h2>
+            </div>
+            <div class="horizontal-scroll-wrapper" id="recommendation-grid">
+                </div>
+        </div>
+
+        <div class="section-spacing scroll-reveal" id="other-events-section" style="display: none; padding-top: 10px;">
+            <div class="recommendation-header" style="margin-bottom: 20px;">
+                <h2 style="font-size: 1.5rem; color: var(--dark-color, #16425e); font-weight: 700;">Event Lainnya (Mendatang)</h2>
+            </div>
+            <div class="horizontal-scroll-wrapper" id="other-events-grid">
+                </div>
+        </div>
+    </div> 
+    
+    
+    <iframe src="../component/footer.html" title="footer" class="frame-footer" scrolling="no"></iframe>
+    
+    <script>
+        let currentEventData = null;
+
+        document.addEventListener("DOMContentLoaded", async function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = parseInt(urlParams.get('id'));
+
+            try {
+                const response = await fetch('../data/data_event.json');
+                const data = await response.json();
+                const event = data.find(e => e.id === eventId);
+
+                if (!event) {
+                    document.body.innerHTML = "<h1 style='text-align:center; margin-top:50px;'>Event tidak ditemukan</h1>";
+                    return;
+                }
+
+                currentEventData = event;
+
+                // Populate data utama
+                document.getElementById('event-title').innerText = event.nama_acara;
+                document.getElementById('event-organizer').innerText = event.penyelenggara;
+                document.getElementById('event-category').innerText = event.tipe_event;
+                
+                // Set CSS class untuk warna badge category
+                const badgeClass = event.tipe_event.replace(/\s+/g, '-').toLowerCase();
+                document.getElementById('event-category').classList.add(badgeClass);
+                
+                document.getElementById('event-date').innerText = formatDate(event.tanggal);
+                document.getElementById('event-time').innerText = event.waktu + " WIB";
+                document.getElementById('event-location').innerText = event.lokasi;
+                document.getElementById('event-description').innerText = event.tentang_event;
+                document.getElementById('event-banner').src = event.gambar;
+
+                const basePrice = event.harga_tiket;
+                const priceLabel = basePrice === 0 ? "Gratis" : "Rp " + basePrice.toLocaleString('id-ID');
+                document.getElementById('price-value').innerText = priceLabel;
+                document.getElementById('total-price-display').innerText = priceLabel;
+
+                setupTicketLogic(basePrice);
+                renderActionButtons(); 
+                
+                // Render list Event Serupa & Event Lainnya
+                renderAdditionalEvents(data, event.tipe_event, event.id);
+
+            } catch (error) {
+                console.error("Error loading event data:", error);
+            }
+
+            // Animasi Scroll
+            const reveals = document.querySelectorAll(".scroll-reveal");
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if(entry.isIntersecting) entry.target.classList.add("active"); });
+            }, { threshold: 0.05 });
+            reveals.forEach(el => observer.observe(el));
+        });
+
+        /* UTILITIES */
+        function formatDate(dateString) {
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const d = new Date(dateString);
+            return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        // --- RENDER TOMBOL DENGAN VALIDASI LOGIN ---
+        function renderActionButtons() {
+            const container = document.getElementById('action-buttons-container');
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+            if (!isLoggedIn) {
+                container.innerHTML = `
+                    <button class="btn-buy-now btn-icon-align" disabled style="background-color: #ccc; cursor: not-allowed; width: 100%; border: none; padding: 15px; border-radius: 8px; color: white;">
+                        <span class="material-icons">lock</span> Lakukan login untuk memesan
+                    </button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button class="btn-buy-now btn-icon-align" id="btn-buy-now">
+                        <span class="material-icons">payments</span> Pesan Tiket
+                    </button>
+                    <button class="btn-add-cart btn-icon-align" id="btn-add-cart">
+                        <span class="material-icons">shopping_cart</span> + Keranjang
+                    </button>
+                `;
+                document.getElementById('btn-buy-now').addEventListener('click', () => processOrder('checkout'));
+                document.getElementById('btn-add-cart').addEventListener('click', () => processOrder('cart'));
+            }
+        }
+
+        function setupTicketLogic(price) {
+            const plusBtn = document.querySelector(".plus");
+            const minusBtn = document.querySelector(".minus");
+            const qtyInput = document.getElementById("qty-input");
+            const totalDisplay = document.getElementById("total-price-display");
+
+            plusBtn.addEventListener("click", () => {
+                let currentVal = parseInt(qtyInput.value);
+                if (currentVal < 10) {
+                    qtyInput.value = currentVal + 1;
+                    updateTotal(qtyInput.value, price);
+                }
+            });
+
+            minusBtn.addEventListener("click", () => {
+                let currentVal = parseInt(qtyInput.value);
+                if (currentVal > 1) {
+                    qtyInput.value = currentVal - 1;
+                    updateTotal(qtyInput.value, price);
+                }
+            });
+
+            function updateTotal(quantity, price) {
+                let total = price * quantity;
+                totalDisplay.innerText = total === 0 ? "Gratis" : "Rp " + total.toLocaleString('id-ID');
+            }
+        }
+
+        function processOrder(type) {
+            const qty = parseInt(document.getElementById('qty-input').value);
+            const orderData = {
+                // ID unik per baris keranjang/checkout, supaya event yang sama
+                // yang ditambahkan beberapa kali tetap bisa dibedakan
+                cartItemId: 'itm-' + Date.now() + '-' + Math.floor(Math.random() * 100000),
+                id: currentEventData.id,
+                nama_acara: currentEventData.nama_acara,
+                penyelenggara: currentEventData.penyelenggara,
+                gambar: currentEventData.gambar,
+                tanggal: currentEventData.tanggal,
+                waktu: currentEventData.waktu,
+                lokasi: currentEventData.lokasi,
+                tipe_event: currentEventData.tipe_event,
+                harga_satuan: currentEventData.harga_tiket,
+                qty: qty,
+                total_harga: currentEventData.harga_tiket * qty
+            };
+
+            if (type === 'checkout') {
+                // Simpan sebagai data checkout langsung, lalu arahkan ke halaman checkout
+                localStorage.setItem('checkoutSekarang', JSON.stringify([orderData]));
+                window.location.href = "checkout.html";
+            } else {
+                let keranjang = JSON.parse(localStorage.getItem('keranjangUser')) || [];
+                keranjang.push(orderData);
+                localStorage.setItem('keranjangUser', JSON.stringify(keranjang));
+                alert("Berhasil masuk ke Keranjang!");
+            }
+        }
+
+        // --- RENDER EVENT SERUPA & EVENT LAINNYA ---
+        function renderAdditionalEvents(allData, eventType, currentId) {
+            const today = new Date('2026-07-01');
+
+            /* 1. Event Serupa */
+            const similarEvents = allData
+                .filter(e => e.tipe_event === eventType && e.id !== currentId)
+                .slice(0, 10); // Dinaikkan batas maksimalnya agar list panjangnya terlihat saat di-scroll penuh
+
+            if (similarEvents.length > 0) {
+                document.getElementById('recommendation-section').style.display = 'block';
+                const gridSimilar = document.getElementById('recommendation-grid');
+                gridSimilar.innerHTML = buildCardsHTML(similarEvents);
+            }
+
+            /* 2. Event Lainnya */
+            const otherEvents = allData
+                .filter(e => e.id !== currentId && new Date(e.tanggal) >= today)
+                .sort((a, b) => new Date(a.tanggal) - new Date(b.tanggal))
+                .slice(0, 12); // Dinaikkan batas maksimalnya juga
+
+            if (otherEvents.length > 0) {
+                document.getElementById('other-events-section').style.display = 'block';
+                const gridOther = document.getElementById('other-events-grid');
+                gridOther.innerHTML = buildCardsHTML(otherEvents);
+            }
+        }
+
+        // Helper function pembuat HTML Card
+        function buildCardsHTML(eventsArray) {
+            return eventsArray.map(rec => {
+                const badgeClass = rec.tipe_event.replace(/\s+/g, '-').toLowerCase();
+                const hargaFormat = rec.harga_tiket === 0 ? "Gratis" : `Rp ${rec.harga_tiket.toLocaleString('id-ID')}`;
+                
+                return `
+                    <div class="recommendation-card">
+                        <div class="rec-image-wrapper" style="position: relative;">
+                            <img src="${rec.gambar}" alt="${rec.nama_acara}" style="width:100%; height:140px; object-fit:cover;">
+                            <span class="badge-type ${badgeClass}" style="position:absolute; top:10px; left:10px; font-size:10px; padding:4px 8px; border-radius:4px; text-transform:capitalize; background:#3498db; color:#fff;">${rec.tipe_event}</span>
+                        </div>
+                        <div class="rec-body">
+                            <h3 style="font-size: 1rem; margin-bottom: 5px;">${rec.nama_acara}</h3>
+                            <p style="font-size:0.8rem; color:#666; display:flex; align-items:center; gap:4px; margin-bottom:4px;">
+                                <span class="material-icons" style="font-size:14px;">calendar_today</span> ${formatDate(rec.tanggal)}
+                            </p>
+                            <p style="font-size:0.8rem; color:#666; display:flex; align-items:center; gap:4px;">
+                                <span class="material-icons" style="font-size:14px;">location_on</span> ${rec.lokasi}
+                            </p>
+                            <div class="rec-footer">
+                                <span style="font-weight:bold; color:var(--dark-color, #16425e);">${hargaFormat}</span>
+                                <a href="event-detail.html?id=${rec.id}" style="text-decoration:none; color: #3498db; font-weight:bold; font-size:0.9rem;">Lihat</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>

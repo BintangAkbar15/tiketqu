@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        background: transparent;
+    }
+    .auth-overlay {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+    .hidden { display: none !important; }
+</style>
+</head>
+<body>
+    <div id="auth-overlay" class="auth-overlay" onclick="handleOverlayClick(event)">
+
+        <div id="login-form" class="card-auth" onclick="event.stopPropagation()">
+            <h3>Login</h3>
+            <form>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="login-email" placeholder="Masukkan Email Anda">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="••••••••">
+                </div>
+                <button type="button" onclick="handleLogin()">Masuk</button>
+            </form>
+            <p class="footer-link" onclick="toggleForm('register')">Belum punya akun? Daftar</p>
+        </div>
+
+        <div id="register-form" class="card-auth hidden" onclick="event.stopPropagation()">
+            <h3>Registrasi</h3>
+            <form>
+                <div class="input-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="register-name" placeholder="Nama Anda (Bukan Email)">
+                </div>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="register-email" placeholder="email@contoh.com">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="register-password" placeholder="••••••••">
+                </div>
+                <button type="button" onclick="handleRegister()">Daftar</button>
+            </form>
+            <p class="footer-link" onclick="toggleForm('login')">Sudah punya akun? Login</p>
+        </div>
+
+    </div>
+
+    <script>
+        /* ============ HELPER: USERS STORAGE ============ */
+        // localStorage structure:
+        // users: [ { name, email, password, phone, nik }, ... ]
+        // currentUser: { name, email, password, phone, nik }
+        // isLoggedIn: "true" | (removed when logged out)
+
+        function getUsers() {
+            try {
+                return JSON.parse(localStorage.getItem('users')) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        function findUserByEmail(email) {
+            const emailKey = email.trim().toLowerCase();
+            const users = getUsers();
+            return users.find(u => u.email.toLowerCase() === emailKey) || null;
+        }
+
+        function setCurrentUser(user) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            localStorage.setItem('isLoggedIn', 'true');
+        }
+
+        /* ============ FORM SWITCH ============ */
+        function toggleForm(type) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            if (type === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+            } else {
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            }
+        }
+
+        function handleOverlayClick(event) {
+            if (event.target.id === 'auth-overlay') {
+                window.parent.postMessage({ action: 'close' }, '*');
+            }
+        }
+
+        /* ============ LOGIN ============ */
+        function handleLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            if (!email) { alert('Masukkan email Anda!'); return; }
+            if (!password) { alert('Masukkan password Anda!'); return; }
+
+            const user = findUserByEmail(email);
+            if (!user) {
+                alert('Email belum terdaftar! Silakan daftar terlebih dahulu.');
+                toggleForm('register');
+                return;
+            }
+
+            if (user.password !== password) {
+                alert('Password salah!');
+                return;
+            }
+
+            setCurrentUser(user);
+            window.parent.postMessage({ action: 'loggedIn' }, '*');
+        }
+
+        /* ============ REGISTER ============ */
+        function handleRegister() {
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+
+            if (!name) { alert('Nama wajib diisi!'); return; }
+            if (!email) { alert('Email wajib diisi!'); return; }
+            if (!password) { alert('Password wajib diisi!'); return; }
+
+            if (findUserByEmail(email)) {
+                alert('Email sudah terdaftar! Silakan login.');
+                toggleForm('login');
+                return;
+            }
+
+            const newUser = {
+                name: name,
+                email: email,
+                password: password,
+                phone: '',
+                nik: ''
+            };
+
+            const users = getUsers();
+            users.push(newUser);
+            saveUsers(users);
+
+            setCurrentUser(newUser);
+            window.parent.postMessage({ action: 'loggedIn' }, '*');
+        }
+
+        /* ============ TERIMA PESAN DARI PARENT (index.html) ============ */
+        window.addEventListener('message', (event) => {
+            const data = event.data;
+            if (!data) return;
+
+            if (data.action === 'show') {
+                document.getElementById('login-email').value = '';
+                document.getElementById('login-password').value = '';
+                document.getElementById('register-name').value = '';
+                document.getElementById('register-email').value = '';
+                document.getElementById('register-password').value = '';
+                toggleForm(data.type || 'login');
+            }
+        });
+    </script>
+</body>
+</html>

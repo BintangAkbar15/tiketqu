@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keranjang Belanja - Tiketqu</title>
+    <link rel="stylesheet" href="../css/keranjang.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        .cart-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .cart-container {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .cart-main-content {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .cart-sidebar-summary {
+            position: sticky;
+            top: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .cart-container {
+                grid-template-columns: 1fr;
+            }
+            .cart-sidebar-summary {
+                position: static;
+            }
+        }
+
+        /* Badge kategori tambahan supaya semua tipe_event dari data_event.json
+           tetap punya warna, bukan cuma "teknologi" */
+        .badge-category.teknologi { background: #3498db; color: #fff; }
+        .badge-category.hiburan { background: #9b59b6; color: #fff; }
+        .badge-category.edukasi { background: #2ecc71; color: #fff; }
+        .badge-category.festival-budaya { background: #e67e22; color: #fff; }
+        .badge-category.olahraga { background: #e74c3c; color: #fff; }
+        .badge-category.bisnis { background: #16425e; color: #fff; }
+
+        /* Kondisi keranjang kosong */
+        .empty-cart-state {
+            text-align: center;
+            padding: 70px 20px;
+            color: #666;
+        }
+        .empty-cart-state .material-icons {
+            font-size: 64px;
+            color: #cfd8dc;
+            display: block;
+            margin-bottom: 16px;
+        }
+        .empty-cart-state p {
+            margin-bottom: 18px;
+            font-size: 0.95rem;
+        }
+        .empty-cart-state a.btn-continue-shopping-empty {
+            display: inline-block;
+            background: #3498db;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        
+        iframe{
+            width: 100%;
+            height: 370px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cart-wrapper">
+        <h1 class="cart-page-title scroll-reveal">Keranjang Belanja</h1>
+
+        <div class="cart-container">
+            <div class="cart-main-content">
+
+                <div class="cart-header-tools scroll-reveal">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="select-all-cart">
+                        <span class="checkmark"></span>
+                        <span class="label-text">Pilih Semua Item (<span id="total-items-count">0</span>)</span>
+                    </label>
+                    <button class="btn-delete-selected" id="btn-delete-selected">Hapus Terpilih</button>
+                </div>
+
+                <div class="cart-items-list" id="cart-items-list">
+                    <!-- Item keranjang dirender otomatis oleh JavaScript dari localStorage -->
+                </div>
+
+            </div>
+
+            <aside class="cart-sidebar-summary">
+                <div class="summary-box scroll-reveal">
+                    <h3>Ringkasan Belanja</h3>
+
+                    <div class="summary-details">
+                        <div class="summary-row">
+                            <span id="selected-items-label">Total Item Terpilih (0 tiket)</span>
+                            <span id="subtotal-display">Rp 0</span>
+                        </div>
+                        <div class="summary-row promo-discount hidden">
+                            <span>Potongan Diskon</span>
+                            <span id="discount-display">-Rp 0</span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span>Total Harga</span>
+                            <strong id="total-cart-display">Rp 0</strong>
+                        </div>
+                    </div>
+
+                    <button class="btn-checkout-start" id="checkout-btn" disabled>
+                        Lanjut ke Checkout (0)
+                    </button>
+
+                    <a href="katalog.html" class="btn-continue-shopping">← Tambah Event Lain</a>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    
+    <iframe src="../component/footer.html" title="footer" class="frame-footer" scrolling="no"></iframe>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            /* ============ ANIMASI SCROLL REVEAL ============ */
+            function initScrollReveal() {
+                const reveals = document.querySelectorAll(".scroll-reveal");
+                const obs = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("active");
+                            obs.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.01 });
+                reveals.forEach(el => obs.observe(el));
+            }
+
+            /* ============ ELEMENT REFERENCES ============ */
+            const listContainer = document.getElementById("cart-items-list");
+            const selectAllCheckbox = document.getElementById("select-all-cart");
+            const totalItemsCount = document.getElementById("total-items-count");
+            const selectedItemsLabel = document.getElementById("selected-items-label");
+            const subtotalDisplay = document.getElementById("subtotal-display");
+            const totalCartDisplay = document.getElementById("total-cart-display");
+            const checkoutBtn = document.getElementById("checkout-btn");
+            const btnDeleteSelected = document.getElementById("btn-delete-selected");
+
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+            function formatDate(dateString) {
+                const d = new Date(dateString);
+                if (isNaN(d.getTime())) return dateString;
+                return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+            }
+
+            function formatRupiah(num) {
+                return "Rp " + Number(num).toLocaleString('id-ID');
+            }
+
+            /* ============ DATA LAYER (localStorage) ============ */
+            function getCart() {
+                return JSON.parse(localStorage.getItem('keranjangUser')) || [];
+            }
+
+            function saveCart(cart) {
+                localStorage.setItem('keranjangUser', JSON.stringify(cart));
+            }
+
+            // Menyimpan sementara item mana saja yang sedang dicentang oleh user
+            let checkedIds = new Set();
+
+            /* ============ RENDER ============ */
+            function render() {
+                const cart = getCart();
+                totalItemsCount.innerText = cart.length;
+
+                if (cart.length === 0) {
+                    listContainer.innerHTML = `
+                        <div class="empty-cart-state">
+                            <span class="material-icons">shopping_cart</span>
+                            <p>Keranjang belanja kamu masih kosong.</p>
+                            <a href="katalog.html" class="btn-continue-shopping-empty">Cari Event Sekarang</a>
+                        </div>
+                    `;
+                    checkedIds.clear();
+                    updateSummary();
+                    return;
+                }
+
+                listContainer.innerHTML = cart.map(item => {
+                    const badgeClass = (item.tipe_event || '').replace(/\s+/g, '-').toLowerCase();
+                    const isChecked = checkedIds.has(item.cartItemId);
+                    return `
+                    <div class="cart-item-card scroll-reveal active" data-cart-id="${item.cartItemId}" data-price="${item.harga_satuan}">
+                        <div class="item-checkbox-wrapper">
+                            <label class="checkbox-container">
+                                <input type="checkbox" class="item-checkbox" ${isChecked ? 'checked' : ''}>
+                                <span class="checkmark"></span>
+                            </label>
+                        </div>
+
+                        <div class="item-image">
+                            <img src="${item.gambar}" alt="${item.nama_acara}">
+                        </div>
+
+                        <div class="item-details">
+                            <span class="badge-category ${badgeClass}">${item.tipe_event || '-'}</span>
+                            <h3 class="event-title">${item.nama_acara}</h3>
+                            <p class="event-organizer">Penyelenggara: ${item.penyelenggara || '-'}</p>
+                            <p class="event-schedule"><span class="material-icons" style="font-size:16px;vertical-align:text-bottom;">calendar_today</span> ${formatDate(item.tanggal)} • ${item.waktu || '-'} WIB</p>
+                        </div>
+
+                        <div class="item-actions-price">
+                            <div class="item-price">${formatRupiah(item.harga_satuan)}</div>
+                            <div class="quantity-controls">
+                                <button class="qty-btn btn-minus">-</button>
+                                <input type="number" class="qty-input" value="${item.qty}" min="1" max="10" readonly>
+                                <button class="qty-btn btn-plus">+</button>
+                            </div>
+                            <button class="btn-remove-item" title="Hapus dari keranjang">
+                                <span class="trash-icon material-icons" style="font-size:16px;vertical-align:text-bottom;">delete</span> Hapus
+                            </button>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+
+                initScrollReveal();
+                updateSelectAllState();
+                updateSummary();
+            }
+
+            /* ============ SUMMARY / CALCULATION ============ */
+            function updateSummary() {
+                const cart = getCart();
+                let totalHarga = 0;
+                let totalTiketTerpilih = 0;
+                let itemTerpilih = 0;
+
+                cart.forEach(item => {
+                    if (checkedIds.has(item.cartItemId)) {
+                        totalHarga += item.harga_satuan * item.qty;
+                        totalTiketTerpilih += item.qty;
+                        itemTerpilih++;
+                    }
+                });
+
+                selectedItemsLabel.innerText = `Total Item Terpilih (${totalTiketTerpilih} tiket)`;
+                subtotalDisplay.innerText = formatRupiah(totalHarga);
+                totalCartDisplay.innerText = formatRupiah(totalHarga);
+
+                if (totalTiketTerpilih > 0) {
+                    checkoutBtn.removeAttribute("disabled");
+                    checkoutBtn.innerText = `Lanjut ke Checkout (${totalTiketTerpilih})`;
+                } else {
+                    checkoutBtn.setAttribute("disabled", "true");
+                    checkoutBtn.innerText = "Lanjut ke Checkout (0)";
+                }
+            }
+
+            function updateSelectAllState() {
+                const cart = getCart();
+                if (cart.length === 0) {
+                    selectAllCheckbox.checked = false;
+                    return;
+                }
+                const allChecked = cart.every(item => checkedIds.has(item.cartItemId));
+                selectAllCheckbox.checked = allChecked;
+            }
+
+            /* ============ EVENT DELEGATION UNTUK ITEM KERANJANG ============ */
+            listContainer.addEventListener("click", function (e) {
+                const card = e.target.closest(".cart-item-card");
+                if (!card) return;
+                const cartId = card.getAttribute("data-cart-id");
+                let cart = getCart();
+                const idx = cart.findIndex(i => i.cartItemId === cartId);
+                if (idx === -1) return;
+
+                // Tombol tambah qty
+                if (e.target.closest(".btn-plus")) {
+                    if (cart[idx].qty < 10) {
+                        cart[idx].qty += 1;
+                        cart[idx].total_harga = cart[idx].harga_satuan * cart[idx].qty;
+                        saveCart(cart);
+                        render();
+                    }
+                    return;
+                }
+
+                // Tombol kurang qty
+                if (e.target.closest(".btn-minus")) {
+                    if (cart[idx].qty > 1) {
+                        cart[idx].qty -= 1;
+                        cart[idx].total_harga = cart[idx].harga_satuan * cart[idx].qty;
+                        saveCart(cart);
+                        render();
+                    }
+                    return;
+                }
+
+                // Tombol hapus item
+                if (e.target.closest(".btn-remove-item")) {
+                    cart.splice(idx, 1);
+                    checkedIds.delete(cartId);
+                    saveCart(cart);
+                    render();
+                    return;
+                }
+            });
+
+            listContainer.addEventListener("change", function (e) {
+                if (e.target.classList.contains("item-checkbox")) {
+                    const card = e.target.closest(".cart-item-card");
+                    const cartId = card.getAttribute("data-cart-id");
+                    if (e.target.checked) {
+                        checkedIds.add(cartId);
+                    } else {
+                        checkedIds.delete(cartId);
+                    }
+                    updateSelectAllState();
+                    updateSummary();
+                }
+            });
+
+            /* ============ PILIH SEMUA ============ */
+            selectAllCheckbox.addEventListener("change", function () {
+                const cart = getCart();
+                if (this.checked) {
+                    cart.forEach(item => checkedIds.add(item.cartItemId));
+                } else {
+                    checkedIds.clear();
+                }
+                render();
+            });
+
+            /* ============ HAPUS TERPILIH ============ */
+            btnDeleteSelected.addEventListener("click", function () {
+                if (checkedIds.size === 0) {
+                    alert("Pilih minimal 1 item untuk dihapus.");
+                    return;
+                }
+                if (!confirm("Hapus item terpilih dari keranjang?")) return;
+                let cart = getCart();
+                cart = cart.filter(item => !checkedIds.has(item.cartItemId));
+                checkedIds.clear();
+                saveCart(cart);
+                render();
+            });
+
+            /* ============ LANJUT KE CHECKOUT ============ */
+            checkoutBtn.addEventListener("click", function () {
+                const cart = getCart();
+                const selectedItems = cart.filter(item => checkedIds.has(item.cartItemId));
+                if (selectedItems.length === 0) return;
+
+                localStorage.setItem('checkoutSekarang', JSON.stringify(selectedItems));
+                window.location.href = "checkout.html";
+            });
+
+            /* ============ INIT ============ */
+            initScrollReveal();
+            render();
+        });
+    </script>
+</body>
+</html>

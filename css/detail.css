@@ -1,0 +1,483 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --dark-color: #16425e;
+  --bg-card: #ffffff;
+  --text-main: #2c3e50;
+  --text-muted: #7f8c8d;
+  --border-color: #eef2f5;
+  --font-utama: 'Inter', sans-serif;
+  --shadow: 0 4px 20px rgba(0, 81, 139, 0.07);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-utama);
+}
+
+body {
+  background-color: #f8fafc;
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+/* BREADCRUMB BUTTON STYLE */
+.breadcrumb-container {
+  max-width: 1200px;
+  margin: 0 auto 20px auto;
+}
+
+.btn-back {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.btn-back:hover {
+  color: var(--primary-color);
+}
+
+
+/* MAIN LAYOUT STRUCTURE                     */
+
+.detail-layout-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 400px; /* Sisi kiri lebar dinamis, sisi kanan tetap 400px */
+  gap: 40px;
+  align-items: start;
+}
+
+
+/* LEFT COLUMN STYLING (SCROLLABLE)          */
+
+.main-content-left {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.badge-category {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  width: fit-content;
+  margin-bottom: 12px;
+}
+
+.badge-category.teknologi { background-color: var(--primary-color); }
+
+.event-header-block h1 {
+  font-size: 2.2rem;
+  color: var(--dark-color);
+  font-weight: 800;
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+
+.organized-by {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+/* Meta Cards layout (Grid inside grid) */
+.event-meta-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.meta-card {
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.meta-icon {
+  font-size: 1.8rem;
+  background: #f0f4f8;
+  padding: 10px;
+  border-radius: 10px;
+  line-height: 1;
+}
+
+.meta-text h4 {
+  font-size: 0.95rem;
+  color: var(--dark-color);
+  margin-bottom: 4px;
+}
+
+.meta-text p {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.meta-text .sub-meta {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Description & Terms Content Typography */
+.description-section, .terms-section {
+  background: var(--bg-card);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.description-section h2, .terms-section h2 {
+  font-size: 1.35rem;
+  color: var(--dark-color);
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.description-section h3 {
+  font-size: 1.05rem;
+  margin: 20px 0 10px 0;
+  color: var(--dark-color);
+}
+
+.description-section p {
+  color: #475569;
+  margin-bottom: 14px;
+  font-size: 0.95rem;
+  text-align: justify;
+}
+
+.description-section ul, .terms-section ol {
+  padding-left: 20px;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.description-section ul li, .terms-section ol li {
+  margin-bottom: 8px;
+}
+
+
+/* RIGHT COLUMN STYLING (STICKY COMPONENT)   */
+
+.sticky-sidebar-right {
+  position: sticky;
+  top: 30px; /* Menjaga komponen box tiket terapung saat di-scroll ke bawah */
+  z-index: 10;
+}
+
+.sticky-ticket-box {
+  background: var(--bg-card);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 81, 139, 0.1);
+  border: 1px solid var(--border-color);
+}
+
+.ticket-image-banner {
+  height: 200px;
+  overflow: hidden;
+}
+
+.ticket-image-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ticket-pricing-body {
+  padding: 24px;
+}
+
+.price-row {
+  margin-bottom: 12px;
+}
+
+.price-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.price-value {
+  font-size: 1.8rem;
+  color: var(--dark-color);
+  font-weight: 800;
+}
+
+.price-value .per-tiket {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.ticket-status-info {
+  background-color: #fff8eb;
+  color: #d97706;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+/* Quantity Button Selector */
+.quantity-selector-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--border-color);
+  margin-bottom: 16px;
+}
+
+.qty-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+.qty-controls {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.qty-btn {
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--dark-color);
+  transition: background 0.2s;
+}
+
+.qty-btn:hover { background: #e2e8f0; }
+
+.qty-input {
+  width: 45px;
+  height: 32px;
+  text-align: center;
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  outline: none;
+}
+
+/* Hide Arrow Input Number HTML5 */
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.total-payment-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+.total-payment-row strong {
+  font-size: 1.25rem;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+/* Action CTA Buttons */
+.action-buttons-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-buy-now {
+  width: 100%;
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+  transition: all 0.2s;
+}
+
+.btn-buy-now:hover {
+  background-color: #2980b9;
+  transform: translateY(-1px);
+}
+
+.btn-add-cart {
+  width: 100%;
+  background-color: #fff;
+  border: 1.5px solid #cbd5e1;
+  color: #475569;
+  padding: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-add-cart:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+}
+
+
+/* RECOMMENDATION SECTION (BOTTOM)           */
+
+.recommendation-section {
+  max-width: 1200px;
+  margin: 60px auto 20px auto;
+  border-top: 2px solid var(--border-color);
+  padding-top: 40px;
+}
+
+.recommendation-header {
+  margin-bottom: 30px;
+}
+
+.recommendation-header h2 {
+  font-size: 1.5rem;
+  color: var(--dark-color);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.recommendation-header p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.recommendation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 Kolom kartu rekomendasi sejajar */
+  gap: 24px;
+}
+
+.recommendation-card {
+  background: var(--bg-card);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.rec-image-wrapper {
+  position: relative;
+  height: 150px;
+}
+
+.rec-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rec-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.rec-title {
+  font-size: 0.95rem;
+  color: var(--dark-color);
+  font-weight: 700;
+  margin-bottom: 10px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.rec-date, .rec-location {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.rec-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rec-price {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--dark-color);
+}
+
+.btn-rec-detail {
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btn-rec-detail:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+/* ANIMATION INTERSECTION OBSERVER SYSTEM    */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* MOBILE RESPONSIVE LAYOUT                 */
+@media (max-width: 992px) {
+  body { padding: 20px; }
+  .detail-layout-container { grid-template-columns: 1fr; gap: 30px; }
+  .sticky-sidebar-right { position: relative; top: 0; } /* Un-sticky pada layar kecil */
+  .recommendation-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 576px) {
+  .event-meta-cards, .recommendation-grid { grid-template-columns: 1fr; }
+  .event-header-block h1 { font-size: 1.7rem; }
+}

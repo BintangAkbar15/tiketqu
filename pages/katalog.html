@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalog Event - Tiketqu</title>
+    <link rel="stylesheet" href="../css/catalog.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* Penyesuaian kecil agar icon sejajar dengan teks tanpa merusak CSS utamamu */
+        .icon-inline {
+            font-size: 16px;
+            vertical-align: text-bottom;
+            margin-right: 4px;
+        }
+        .search-icon-material {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+
+        
+        iframe{
+            width: 100%;
+            height: 370px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="catalog-wrapper">
+        
+        <aside class="sidebar-filter scroll-reveal">
+            <div class="filter-header">
+                <h3>Filter Pencarian</h3>
+                <button class="btn-reset" id="btn-reset">Reset</button>
+            </div>
+            
+            <div class="filter-group">
+                <h4>Tipe Event</h4>
+                <div id="filter-kategori">
+                    </div>
+            </div>
+
+            <div class="filter-group">
+                <h4>Range Harga</h4>
+                <div class="price-input-range">
+                    <input type="range" min="0" max="2000000" value="2000000" class="slider" id="price-slider">
+                    <div class="price-labels">
+                        <span>Rp 0</span>
+                        <span id="price-label-max">Rp 2.000.000+</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h4>Lokasi</h4>
+                <select class="filter-select" id="location-select">
+                    <option value="">Semua Lokasi</option>
+                    </select>
+            </div>
+
+            <div class="filter-group">
+                <h4>Waktu Acara</h4>
+                <label class="radio-container">Semua Tanggal
+                    <input type="radio" name="waktu" value="semua" checked>
+                    <span class="circlemark"></span>
+                </label>
+                <label class="radio-container">Bulan Ini
+                    <input type="radio" name="waktu" value="bulan-ini">
+                    <span class="circlemark"></span>
+                </label>
+            </div>
+        </aside>
+
+        <main class="catalog-content">
+            
+            <div class="catalog-topbar scroll-reveal">
+                <div class="search-box" style="position: relative;">
+                    <span class="material-icons search-icon-material">search</span>
+                    <input type="text" id="search-input" placeholder="Cari nama acara, penyelenggara, atau lokasi..." style="padding-left: 40px;">
+                </div>
+                
+                <div class="sort-box">
+                    <label for="sort-select">Urutkan:</label>
+                    <select id="sort-select" class="sort-select">
+                        <option value="terdekat">Tanggal Terdekat</option>
+                        <option value="terlama">Tanggal Terlama</option>
+                        <option value="harga-rendah">Harga: Rendah ke Tinggi</option>
+                        <option value="harga-tinggi">Harga: Tinggi ke Rendah</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="products-grid" id="products-grid">
+                </div>
+
+            <div class="pagination-container scroll-reveal" id="pagination-container">
+                </div>
+
+        </main>
+    </div>
+
+    <iframe src="../component/footer.html" title="footer" class="frame-footer" scrolling="no"></iframe>
+
+    <script>
+        // State Management
+        let allEvents = [];
+        let filteredEvents = [];
+        let currentPage = 1;
+        const itemsPerPage = 20;
+
+        // Intersection Observer untuk animasi masuk (Scroll Reveal)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add("active");
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.05 });
+
+        // Event Listener saat DOM siap
+        document.addEventListener("DOMContentLoaded", async function () {
+            // Animasi elemen statis awal
+            document.querySelectorAll(".scroll-reveal").forEach(el => observer.observe(el));
+
+            try {
+                // Fetch data JSON
+                const response = await fetch('../data/data_event.json');
+                allEvents = await response.json();
+                filteredEvents = [...allEvents];
+
+                // Render UI Filter
+                generateDynamicFilters();
+
+                // Sort default (terdekat) & Render Grid
+                applyFilters();
+
+            } catch (error) {
+                console.error("Gagal memuat data event:", error);
+                document.getElementById('products-grid').innerHTML = '<p>Gagal memuat data katalog.</p>';
+            }
+
+            // Bind Event Listeners untuk interaktivitas
+            document.getElementById('search-input').addEventListener('input', applyFilters);
+            document.getElementById('sort-select').addEventListener('change', applyFilters);
+            document.getElementById('location-select').addEventListener('change', applyFilters);
+            document.getElementById('price-slider').addEventListener('input', function(e) {
+                document.getElementById('price-label-max').innerText = formatRupiah(parseInt(e.target.value));
+                applyFilters();
+            });
+            document.querySelectorAll('input[name="waktu"]').forEach(radio => {
+                radio.addEventListener('change', applyFilters);
+            });
+            document.getElementById('btn-reset').addEventListener('click', resetFilters);
+        });
+
+        /* --- UTILS FORMATTER --- */
+        function formatRupiah(angka) {
+            return angka === 0 ? "Gratis" : "Rp " + angka.toLocaleString('id-ID');
+        }
+
+        function formatDate(dateString) {
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const d = new Date(dateString);
+            return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        /* --- GENERATE DYNAMIC FILTERS --- */
+        function generateDynamicFilters() {
+            // 1. Kategori (Tipe Event)
+            const typeSet = new Set(allEvents.map(ev => ev.tipe_event));
+            const filterContainer = document.getElementById('filter-kategori');
+            filterContainer.innerHTML = '';
+            
+            typeSet.forEach(type => {
+                const label = document.createElement('label');
+                label.className = 'checkbox-container';
+                label.style.textTransform = 'capitalize';
+                label.innerHTML = `
+                    ${type}
+                    <input type="checkbox" value="${type}" class="filter-type-checkbox">
+                    <span class="checkmark"></span>
+                `;
+                filterContainer.appendChild(label);
+            });
+
+            // Tambahkan listener ke setiap checkbox yang baru dibuat
+            document.querySelectorAll('.filter-type-checkbox').forEach(cb => {
+                cb.addEventListener('change', applyFilters);
+            });
+
+            // 2. Lokasi
+            const locSet = new Set(allEvents.map(ev => ev.lokasi));
+            const locSelect = document.getElementById('location-select');
+            
+            locSet.forEach(loc => {
+                const option = document.createElement('option');
+                option.value = loc;
+                option.textContent = loc;
+                locSelect.appendChild(option);
+            });
+
+            // --- LOGIKA BACA LOCAL STORAGE YANG DIPERBARUI ---
+            const savedFilter = localStorage.getItem('filterKategori');
+            if (savedFilter) {
+                const allCheckboxes = document.querySelectorAll('.filter-type-checkbox');
+                
+                // Looping semua checkbox, jika valuenya sama dengan yang disimpan, centang!
+                allCheckboxes.forEach(cb => {
+                    if (cb.value.toLowerCase() === savedFilter.toLowerCase()) {
+                        cb.checked = true;
+                    }
+                });
+                
+                // Hapus dari local storage agar tidak memfilter terus saat katalog di-refresh manual
+                localStorage.removeItem('filterKategori'); 
+            }
+        }
+
+        /* --- LOGIC FILTERING & SORTING --- */
+        function applyFilters() {
+            const searchQuery = document.getElementById('search-input').value.toLowerCase();
+            const sortValue = document.getElementById('sort-select').value;
+            const locationValue = document.getElementById('location-select').value;
+            const maxPrice = parseInt(document.getElementById('price-slider').value);
+            const timeFilter = document.querySelector('input[name="waktu"]:checked').value;
+
+            // Dapatkan kategori yang dicentang
+            const checkedTypes = Array.from(document.querySelectorAll('.filter-type-checkbox:checked')).map(cb => cb.value);
+
+            // 1. FILTER
+            filteredEvents = allEvents.filter(event => {
+                // Pencarian Text
+                const matchSearch = event.nama_acara.toLowerCase().includes(searchQuery) || 
+                                    event.penyelenggara.toLowerCase().includes(searchQuery) || 
+                                    event.lokasi.toLowerCase().includes(searchQuery);
+                
+                // Filter Kategori (Jika tidak ada yang dicentang, anggap semua aktif)
+                const matchType = checkedTypes.length === 0 || checkedTypes.includes(event.tipe_event);
+
+                // Filter Lokasi
+                const matchLocation = locationValue === "" || event.lokasi === locationValue;
+
+                // Filter Harga
+                const matchPrice = event.harga_tiket <= maxPrice;
+
+                // Filter Waktu
+                let matchTime = true;
+                if(timeFilter === "bulan-ini") {
+                    const today = new Date('2026-07-01'); // Acuan waktu saat ini
+                    const eventDate = new Date(event.tanggal);
+                    matchTime = (today.getMonth() === eventDate.getMonth() && today.getFullYear() === eventDate.getFullYear());
+                }
+
+                return matchSearch && matchType && matchLocation && matchPrice && matchTime;
+            });
+
+            // 2. SORT
+            filteredEvents.sort((a, b) => {
+                if (sortValue === 'terdekat') return new Date(a.tanggal) - new Date(b.tanggal);
+                if (sortValue === 'terlama') return new Date(b.tanggal) - new Date(a.tanggal);
+                if (sortValue === 'harga-rendah') return a.harga_tiket - b.harga_tiket;
+                if (sortValue === 'harga-tinggi') return b.harga_tiket - a.harga_tiket;
+                return 0;
+            });
+
+            // Reset ke halaman 1 setiap kali filter berubah
+            currentPage = 1;
+            renderGrid();
+            renderPagination();
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('sort-select').value = 'terdekat';
+            document.getElementById('location-select').value = '';
+            document.getElementById('price-slider').value = 2000000;
+            document.getElementById('price-label-max').innerText = "Rp 2.000.000+";
+            document.querySelectorAll('.filter-type-checkbox').forEach(cb => cb.checked = false);
+            document.querySelector('input[name="waktu"][value="semua"]').checked = true;
+            
+            applyFilters();
+        }
+
+        /* --- RENDER DATA GRID --- */
+        function renderGrid() {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = ''; // Bersihkan kontainer
+
+            // Hitung Index Paginasi
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const eventsToShow = filteredEvents.slice(startIndex, endIndex);
+
+            if (eventsToShow.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 50px;"><h4>Event tidak ditemukan. Coba ubah filter pencarianmu.</h4></div>';
+                return;
+            }
+
+            // Looping dan buat elemen HTML
+            eventsToShow.forEach((event) => {
+                // Konversi spasi di tipe_event menjadi strip untuk class css (misal "festival budaya" -> "festival-budaya")
+                const badgeClass = event.tipe_event.replace(/\s+/g, '-').toLowerCase();
+
+                const card = document.createElement('div');
+                card.className = 'product-card scroll-reveal';
+                card.innerHTML = `
+                    <div class="card-image-wrapper">
+                        <img src="${event.gambar}" alt="${event.nama_acara}">
+                        <span class="badge-type ${badgeClass}" style="text-transform: capitalize;">${event.tipe_event}</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="event-name">${event.nama_acara}</h3>
+                        <div class="event-meta">
+                            <p class="event-date">
+                                <span class="material-icons icon-inline">calendar_today</span> 
+                                ${formatDate(event.tanggal)} • ${event.waktu} WIB
+                            </p>
+                            <p class="event-location">
+                                <span class="material-icons icon-inline">location_on</span> 
+                                ${event.lokasi}
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <div class="event-price">${formatRupiah(event.harga_tiket)}</div>
+                            <button class="btn-detail" onclick="window.location.href='event-detail.html?id=${event.id}'">Lihat Detail</button>
+                        </div>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+                // Tambahkan elemen baru ke observer scroll-reveal
+                observer.observe(card);
+            });
+        }
+
+        /* --- RENDER PAGINATION --- */
+        function renderPagination() {
+            const pagination = document.getElementById('pagination-container');
+            pagination.innerHTML = '';
+            
+            const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
+
+            if (totalPages <= 1) return; // Sembunyikan paginasi jika hanya 1 halaman
+
+            // Tombol Prev
+            const btnPrev = document.createElement('button');
+            btnPrev.className = 'btn-page nav-btn';
+            btnPrev.innerHTML = '&laquo; Prev';
+            btnPrev.disabled = currentPage === 1;
+            btnPrev.addEventListener('click', () => {
+                if (currentPage > 1) { currentPage--; renderGrid(); renderPagination(); window.scrollTo(0, 0); }
+            });
+            pagination.appendChild(btnPrev);
+
+            // Tombol Angka (Disederhanakan untuk contoh)
+            for (let i = 1; i <= totalPages; i++) {
+                const btnPage = document.createElement('button');
+                btnPage.className = `btn-page ${i === currentPage ? 'active' : ''}`;
+                btnPage.innerText = i;
+                btnPage.addEventListener('click', () => {
+                    currentPage = i;
+                    renderGrid();
+                    renderPagination();
+                    window.scrollTo(0, 0); // Scroll ke atas setelah pindah halaman
+                });
+                pagination.appendChild(btnPage);
+            }
+
+            // Tombol Next
+            const btnNext = document.createElement('button');
+            btnNext.className = 'btn-page nav-btn';
+            btnNext.innerHTML = 'Next &raquo;';
+            btnNext.disabled = currentPage === totalPages;
+            btnNext.addEventListener('click', () => {
+                if (currentPage < totalPages) { currentPage++; renderGrid(); renderPagination(); window.scrollTo(0, 0); }
+            });
+            pagination.appendChild(btnNext);
+        }
+    </script>
+</body>
+</html>

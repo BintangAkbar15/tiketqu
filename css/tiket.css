@@ -1,0 +1,350 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --dark-color: #16425e;
+  --bg-card: #ffffff;
+  --text-main: #2c3e50;
+  --text-muted: #7f8c8d;
+  --border-color: #eef2f5;
+  --font-utama: 'Inter', sans-serif;
+  --shadow: 0 2px 12px rgba(0, 81, 139, 0.05);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-utama);
+}
+
+body {
+  background-color: #f4f6f9; /* Background abu muda agar kontras dengan kartu putih shopee */
+  color: var(--text-main);
+}
+
+.orders-container {
+  max-width: 980px; /* Ukuran standard lebar container riwayat/user dashboard */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 80px;
+}
+
+
+/* SHOPEE NAVIGATION TABS STYLING            */
+
+.orders-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--bg-card);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 16px 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  text-align: center;
+  position: relative;
+  transition: color 0.2s;
+}
+
+.tab-btn:hover {
+  color: var(--primary-color);
+}
+
+/* Garis bawah penanda aktif ala Shopee */
+.tab-btn.active {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.tab-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--primary-color);
+}
+
+/* Badge angka indikator merah di tab */
+.tab-badge {
+  background-color: #e11d48;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+
+/* SEARCH BAR COMPONENT                      */
+
+.search-orders-box {
+  position: relative;
+  background: var(--bg-card);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.search-orders-box .search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.search-orders-box input {
+  width: 100%;
+  padding: 14px 14px 14px 46px;
+  border: none;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  font-size: 0.9rem;
+  outline: none;
+  transition: background-color 0.2s;
+}
+
+.search-orders-box input:focus {
+  background-color: #fff;
+  box-shadow: inset 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+
+/* ORDER CARD COMPONENT                      */
+
+.orders-list-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.order-card {
+  background: var(--bg-card);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+/* Header Kartu */
+.order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.organizer-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.btn-chat-organizer {
+  background: none;
+  border: 1px solid #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.btn-chat-organizer:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.order-status {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* State Status Colors */
+.text-danger { color: #e11d48; }
+.text-success { color: var(--secondary-color); }
+.text-muted { color: var(--text-muted); }
+
+/* Body Kartu */
+.order-card-body {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: 20px;
+  padding: 20px;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.order-card-body img {
+  width: 100px;
+  height: 75px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+}
+
+.order-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.event-title {
+  font-size: 1.05rem;
+  color: var(--dark-color);
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.event-meta-info {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.ticket-qty-badge {
+  font-size: 0.75rem;
+  background-color: #f1f5f9;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 4px;
+  width: fit-content;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.order-item-price {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* Footer Kartu */
+.order-card-footer {
+  padding: 16px 20px;
+  background-color: #fafbfc;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-end;
+}
+
+.total-payment-summary {
+  font-size: 0.95rem;
+}
+
+.label-total {
+  color: #334155;
+  margin-right: 6px;
+}
+
+.price-total {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--primary-color); /* Atau bisa gunakan jingga/merah cerah sesuai selera */
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.payment-deadline {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-right: auto; /* Memaksa info deadline bergeser ke sudut paling kiri */
+}
+
+.time-limit {
+  color: #e11d48;
+  font-weight: 700;
+}
+
+/* Tipe Tombol Aksi */
+.btn-primary-action {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-primary-action:hover {
+  opacity: 0.9;
+}
+
+/* Tombol khusus bayar sekarang warna hijau bayar */
+.btn-primary-action.pay-now {
+  background-color: #ff5722; /* Jingga tegas shopee vibrance */
+}
+
+.btn-secondary-action {
+  background-color: #fff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-secondary-action:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+}
+
+
+/* SCROLL REVEAL TIMING EFFECTS              */
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.scroll-reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* SCREEN RESPONSIVENESS CAPABILITIES        */
+
+@media (max-width: 768px) {
+  .orders-tabs { grid-template-columns: repeat(2, 1fr); }
+  .order-card-body { grid-template-columns: 1fr; gap: 14px; text-align: center; }
+  .order-card-body img { margin: 0 auto; }
+  .order-details { align-items: center; }
+  .action-buttons { flex-direction: column; align-items: stretch; width: 100%; }
+  .payment-deadline { text-align: center; margin-bottom: 6px; }
+}

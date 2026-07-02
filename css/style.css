@@ -1,0 +1,458 @@
+/* Global CSS */
+:root {
+  --primary-color: #3498db;
+  --dark-color: #16425e;
+  --secondary-color: #2ecc71;
+  --text-color: #333333;
+  --bg-color: #ffffff;
+
+  --font-utama: 'Inter', 'Segoe UI', sans-serif;
+
+  --fs-xs: 0.75rem;    
+  --fs-sm: 0.875rem;   
+  --fs-base: 1rem;     
+  --fs-md: 1.125rem;   
+  --fs-lg: 1.25rem;    
+  --fs-xl: 1.5rem;     
+  --fs-2xl: 1.875rem;  
+  --fs-3xl: 2.25rem;   
+  --fs-4xl: 3rem;      
+  --fs-5xl: 3.75rem;  
+  
+  --shadow: 0 4px 14px rgba(0, 81, 139, 0.105);
+}
+
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: var(--font-utama);
+}
+
+.remove-bg{
+  background: none;
+}
+
+.text-color-primary{
+  color: var(--primary-color);
+}
+
+.text-color-light{
+  color: var(--bg-color);
+}
+
+.bg-primary{
+  background-color: var(--primary-color);
+}
+
+
+iframe {
+  width: 100%;
+  border: none;
+  display: block;
+}
+
+.frame-nav {
+  height: 80px; 
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999; 
+  transition: height 0.2s ease-in-out;
+}
+
+.frame-content {
+  height: 100vh;
+  padding-top: 80px;
+}
+
+/* navbar */
+nav {
+  height: 80px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* Membagi navbar jadi 3 zona absolut */
+  padding: 0px 100px;
+  align-items: center;
+  background: var(--bg-color); /* Menghindari transparan saat iframe membesar */
+}
+
+/* ZONA KIRI: Logo */
+nav .logo {
+  display: flex;  
+  align-items: center;
+  justify-self: start; /* Kunci logo mentok ke kiri */
+  gap: 20px;
+  cursor: pointer;
+}
+
+nav .logo label {
+  text-transform: uppercase;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+nav .logo label span {
+  text-transform: lowercase;
+}
+
+nav .logo .img {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+nav .logo .img img {
+  height: 50px;
+}
+
+/* ZONA TENGAH: Navigation */
+nav .navigation {
+  justify-self: center; /* Kunci menu 100% tepat di tengah layar */
+}
+
+nav .navigation ul {
+  display: flex;
+}
+
+nav .navigation ul li {
+  list-style: none;
+  font-weight: 600;
+  padding: 5px 20px;
+  margin: 0px 10px;
+  transition: all ease 0.3s;
+  cursor: pointer;
+}
+
+nav .navigation ul li label {
+  cursor: pointer;
+}
+
+nav .navigation ul li:not(.active):hover {
+  transform: scale(1.1);
+  color: var(--dark-color);
+}
+
+nav .navigation ul .active {
+  border-bottom: 3px solid var(--primary-color);
+  color: var(--dark-color);
+  font-size: var(--fs-base);
+  font-weight: 700;
+}
+
+/* ZONA KANAN: Profile & Login */
+nav .profile_login {
+  display: flex;
+  align-items: center;
+  justify-self: end; /* Kunci profil mentok ke kanan */
+}
+
+nav .profile_login .profile{
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  img{
+    height: 40px;
+    aspect-ratio: 1 / 1;
+    border-radius: 50px;
+  }
+  label{
+    font-size: var(--fs-sm);
+    text-transform: uppercase;
+    font-weight: 600;
+    font-weight: 600;
+  }
+}
+
+nav .profile_login .profile .img{
+  border: 3px solid var(--primary-color);
+  padding: 1px;
+  aspect-ratio: 1 / 1;
+  border-radius: 50px;
+  height: fit-content;
+  width: fit-content;
+}
+
+/* button login register */
+nav .profile_login .login_register{
+  display: flex;
+  gap: 10px;
+  button{
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 3px solid var(--primary-color);
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    transition: all ease 0.3s;
+    cursor: pointer;
+  }
+  button:hover{
+    transform: scale(1.1);
+  }
+}
+
+/* Styling Sidebar Mobile & Google Icons */
+.material-icons {
+    vertical-align: middle;
+}
+
+.burger-menu { 
+    display: none; 
+    cursor: pointer; 
+}
+.burger-menu .material-icons {
+    font-size: 30px;
+    color: var(--dark-color);
+}
+
+.sidebar {
+    position: fixed; 
+    top: 0; 
+    right: -300px; /* Tersembunyi di luar layar kanan */
+    width: 250px; 
+    height: 100%;
+    background: white; 
+    z-index: 10000; 
+    transition: 0.3s; 
+    padding: 20px;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+}
+
+.sidebar.active { 
+    right: 0; /* Muncul ke dalam layar */
+}
+
+.sidebar .close-btn {
+    font-size: 30px;
+    cursor: pointer;
+    text-align: right;
+    margin-bottom: 20px;
+    color: var(--dark-color);
+}
+
+.sidebar a { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    padding: 15px 0; 
+    text-decoration: none; 
+    color: var(--text-color); 
+    font-weight: 600;
+}
+
+.sidebar a:hover {
+    color: var(--primary-color);
+}
+
+.profile-section { 
+    text-align: center; 
+    padding: 10px 0 20px 0; 
+}
+
+.profile-section img { 
+    width: 80px; 
+    height: 80px; 
+    border-radius: 50%; 
+    margin-bottom: 10px; 
+    border: 3px solid var(--primary-color);
+    padding: 2px;
+}
+
+/* Responsive Adjustments: Menyembunyikan elemen desktop di HP */
+@media (max-width: 768px) {
+    .desktop-only { display: none !important; }
+    .burger-menu { display: block; }
+    nav { 
+        display: flex; /* Kembali ke flexbox untuk mobile */
+        justify-content: space-between; /* Dorong kiri kanan */
+        padding: 0 20px; 
+    } 
+}
+/* footer */
+footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 60px 100px;
+    background: var(--dark-color);
+    color: white;
+    gap: 40px;
+}
+
+.footer-col {
+    flex: 1;
+    min-width: 200px;
+}
+
+.footer-col h3 {
+    margin-bottom: 20px;
+    font-size: var(--fs-md);
+}
+
+.footer-col ul {
+    list-style: none;
+}
+
+.footer-col ul li a, 
+.footer-col .social-links a {
+    color: #ccc;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 10px;
+    transition: 0.3s;
+}
+
+.footer-col ul li a:hover, 
+.footer-col .social-links a:hover {
+    color: var(--primary-color);
+}
+
+.logo-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.logo-footer img {
+    height: 40px;
+}
+
+/* Styling Form Kontak */
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.contact-form label {
+    font-size: var(--fs-xs);
+    color: #ccc;
+    text-transform: uppercase;
+}
+
+.contact-form input, 
+.contact-form textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #444;
+    background: white ; 
+    color: var(--text-color);
+    font-family: var(--font-utama);
+}
+
+.contact-form button {
+    margin-top: 5px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.contact-form button:hover {
+    filter: brightness(1.2);
+    transform: scale(1.02);
+}
+
+/* Auth */
+.hidden { 
+    display: none !important; 
+}
+
+.auth-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(22, 66, 94, 0.4);
+    backdrop-filter: blur(8px); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; 
+}
+
+.card-auth {
+    background: #ffffff;
+    padding: 2.5rem;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    color: var(--dark-color);
+    animation: fadeIn 0.3s ease-in-out; 
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.card-auth h3 { 
+    margin-bottom: 1.5rem; 
+    font-size: var(--fs-2xl); 
+    color: var(--dark-color); 
+}
+
+.input-group { 
+    margin-bottom: 1rem; 
+    text-align: left; 
+}
+
+.input-group label { 
+    display: block; 
+    margin-bottom: 0.5rem; 
+    font-size: var(--fs-sm); 
+    color: var(--text-color); 
+}
+
+.input-group input { 
+    width: 100%; 
+    padding: 0.8rem; 
+    border-radius: 8px; 
+    border: 1px solid #ddd; 
+    font-size: var(--fs-base);
+}
+
+.card-auth button { 
+    width: 100%; 
+    padding: 0.8rem; 
+    margin-top: 1rem; 
+    border: none; 
+    border-radius: 8px; 
+    background: var(--primary-color); 
+    color: white; 
+    font-weight: bold; 
+    cursor: pointer; 
+    transition: 0.3s; 
+}
+
+.card-auth button:hover { 
+    background: var(--dark-color); 
+    transform: scale(1.05); 
+}
+
+.footer-link { 
+    margin-top: 1.5rem; 
+    font-size: var(--fs-sm); 
+    cursor: pointer; 
+    color: var(--primary-color); 
+}
+
+.footer-link:hover { 
+    text-decoration: underline; 
+}

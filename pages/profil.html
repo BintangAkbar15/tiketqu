@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Saya - Tiketqu</title>
+    <link rel="stylesheet" href="../css/profile.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .menu-link { display: flex; align-items: center; gap: 10px; }
+        .material-icons { font-size: 20px; }
+        .avatar-image .btn-change-avatar { display: flex; align-items: center; justify-content: center; }
+        #avatar-preview { object-fit: cover; }
+        
+        /* CSS Untuk Overlay Password (Mengikuti style.css index) */
+        .auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(22, 66, 94, 0.4); backdrop-filter: blur(8px); 
+            display: flex; align-items: center; justify-content: center; z-index: 9999;
+        }
+        .hidden { display: none !important; }
+        
+        .card-auth {
+            background: #ffffff; padding: 2.5rem; border-radius: 15px; width: 100%; max-width: 400px;
+            box-shadow: 0 4px 14px rgba(0, 81, 139, 0.105); text-align: center; color: #16425e;
+            animation: fadeIn 0.3s ease-in-out; 
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        
+        .card-auth h3 { margin-bottom: 1.5rem; font-size: 1.875rem; }
+        .input-group { margin-bottom: 1rem; text-align: left; }
+        .input-group label { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: #333; }
+        .input-group input { width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #ddd; font-size: 1rem; }
+        .card-auth button { width: 100%; padding: 0.8rem; margin-top: 1rem; border: none; border-radius: 8px; background: #3498db; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .card-auth button:hover { background: #16425e; transform: scale(1.05); }
+
+        /* Ringkasan data user (email, no HP, NIK) di sidebar profil */
+        .user-info-summary { width: 100%; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.08); text-align: left; }
+        .user-info-summary p { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; margin: 6px 0; word-break: break-all; }
+        .user-info-summary .material-icons { font-size: 18px; opacity: 0.7; }
+
+        .menu-link.text-danger { color: #e74c3c; }
+        .menu-link.text-danger:hover { color: #c0392b; }
+
+        /* TENTANG APLIKASI */
+        .about-app-section { margin-top: 25px; }
+        .about-app-content p { line-height: 1.7; color: #333; margin-bottom: 12px; }
+        .about-app-content h4 { margin: 16px 0 10px 0; color: #16425e; }
+        .about-app-features { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+        .about-app-features li { display: flex; align-items: center; gap: 10px; font-size: 0.92rem; color: #333; }
+        .about-app-features .material-icons { color: #3498db; font-size: 20px; }
+
+        
+        iframe{
+            width: 100%;
+            height: 370px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-container">
+        
+        <aside class="profile-sidebar scroll-reveal">
+            <div class="user-avatar-wrapper">
+                <div class="avatar-image">
+                    <img src="" alt="Foto Profil" id="avatar-preview">
+                    <label for="upload-avatar" class="btn-change-avatar" title="Ubah Foto">
+                        <span class="material-icons">photo_camera</span>
+                    </label>
+                    <input type="file" id="upload-avatar" accept="image/*" style="display: none;">
+                </div>
+                <h3 id="display-name">Memuat...</h3>
+                <p class="user-role-tag">Pengguna Tiketqu</p>
+
+                <div class="user-info-summary">
+                    <p><span class="material-icons">email</span> <span id="info-email">-</span></p>
+                    <p><span class="material-icons">call</span> <span id="info-phone">-</span></p>
+                    <p><span class="material-icons">badge</span> <span id="info-nik">-</span></p>
+                </div>
+            </div>
+            
+            <div class="profile-menu-links">
+                <a href="#" class="menu-link active"><span class="material-icons">person</span> Informasi Akun</a>
+                <a href="tickets.html" class="menu-link"><span class="material-icons">confirmation_number</span> Pesanan Saya</a>
+                <a href="keranjang.html" class="menu-link"><span class="material-icons">shopping_cart</span> Keranjang Belanja</a>
+                <a href="#" class="menu-link text-danger" onclick="logoutProfile(event)"><span class="material-icons">logout</span> Keluar</a>
+            </div>
+        </aside>
+
+        <main class="profile-main-content">
+            
+            <section class="profile-card-section scroll-reveal">
+                <div class="card-header-title">
+                    <h2>Detail Profil Pengguna</h2>
+                    <p>Kelola informasi data diri Anda untuk mempermudah pengisian otomatis saat checkout tiket.</p>
+                </div>
+                
+                <form id="form-edit-profile">
+                    <div class="profile-form-grid">
+                        <div class="form-group">
+                            <label for="profile-name">Nama Lengkap (Sesuai KTP)</label>
+                            <input type="text" id="profile-name" placeholder="Nama lengkap Anda" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-email">Alamat Email</label>
+                            <input type="email" id="profile-email" placeholder="email@contoh.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-phone">Nomor Handphone (WhatsApp)</label>
+                            <input type="tel" id="profile-phone" placeholder="Contoh: 08123456789">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-nik">Nomor Identitas (NIK KTP)</label>
+                            <input type="text" id="profile-nik" placeholder="3171xxxxxxxxxxxx">
+                        </div>
+                    </div>
+                    <div class="form-action-wrapper" style="display: flex; gap: 10px;">
+                        <button type="submit" class="btn-save-profile">Simpan Perubahan</button>
+                        <button type="button" class="btn-save-profile" style="background:#e74c3c;" onclick="showPasswordOverlay()">Ubah Kata Sandi</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="profile-card-section scroll-reveal about-app-section">
+                <div class="card-header-title">
+                    <h2>Tentang Aplikasi Tiketqu</h2>
+                    <p>Kenali lebih dekat platform yang kamu gunakan.</p>
+                </div>
+                <div class="about-app-content">
+                    <p><strong>Tiketqu</strong> adalah platform pemesanan tiket acara secara online yang memudahkan pengguna untuk mencari, memilih, dan membeli tiket berbagai jenis event — mulai dari konser musik, seminar, workshop, hingga pameran — hanya dalam beberapa langkah sederhana.</p>
+                    <p>Melalui Tiketqu, pengguna dapat menjelajahi katalog event terbaru, melihat detail lengkap setiap acara (tanggal, lokasi, dan kategori tiket), melakukan pemesanan lewat halaman checkout, serta memantau status transaksi dan e-tiket langsung dari halaman "Pesanan Saya".</p>
+                    <h4>Fitur Utama:</h4>
+                    <ul class="about-app-features">
+                        <li><span class="material-icons">event</span> Katalog event lengkap dan terus diperbarui</li>
+                        <li><span class="material-icons">shopping_cart</span> Keranjang belanja untuk beli beberapa tiket sekaligus</li>
+                        <li><span class="material-icons">receipt_long</span> Riwayat & status transaksi yang mudah dipantau</li>
+                        <li><span class="material-icons">account_circle</span> Profil pengguna dengan data pemesanan otomatis terisi</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="password-overlay" class="auth-overlay hidden" onclick="closePasswordOverlay()">
+        <div class="card-auth" onclick="event.stopPropagation()">
+            <h3>Ubah Kata Sandi</h3>
+            <form id="form-change-password">
+                <div class="input-group">
+                    <label>Kata Sandi Saat Ini</label>
+                    <input type="password" id="current-password" placeholder="••••••••" required>
+                </div>
+                <div class="input-group">
+                    <label>Kata Sandi Baru</label>
+                    <input type="password" id="new-password" placeholder="••••••••" required>
+                </div>
+                <div class="input-group">
+                    <label>Konfirmasi Kata Sandi Baru</label>
+                    <input type="password" id="confirm-password" placeholder="••••••••" required>
+                </div>
+                <button type="submit">Perbarui Kata Sandi</button>
+            </form>
+        </div>
+    </div>
+
+    
+    <iframe src="../component/footer.html" title="footer" class="frame-footer" scrolling="no"></iframe>
+
+    <script>
+        /* ============ HELPER: USERS STORAGE ============ */
+        function getUsers() {
+            try {
+                return JSON.parse(localStorage.getItem('users')) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+        function saveUsers(users) {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Ambil Data Identitas User Yang Sedang Login
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+
+            if (!isLoggedIn || !currentUser) {
+                // Tendang jika belum login
+                alert("Silakan login terlebih dahulu!");
+                window.parent.document.querySelector('.frame-content').src = './pages/home.html';
+                return;
+            }
+
+            // Masukkan data ke dalam Form Input
+            document.getElementById('display-name').innerText = currentUser.name;
+            document.getElementById('profile-name').value = currentUser.name;
+            document.getElementById('profile-email').value = currentUser.email;
+            document.getElementById('profile-phone').value = currentUser.phone || '';
+            document.getElementById('profile-nik').value = currentUser.nik || '';
+
+            // Munculkan ringkasan Email, No HP, dan No Identitas di sidebar
+            document.getElementById('info-email').innerText = currentUser.email || '-';
+            document.getElementById('info-phone').innerText = currentUser.phone || '-';
+            document.getElementById('info-nik').innerText = currentUser.nik || '-';
+
+            // AMBIL FOTO PROFIL
+            const avatarPreview = document.getElementById("avatar-preview");
+            avatarPreview.src = currentUser.photo ? currentUser.photo : '../assets/img/image.png';
+
+            // Cari index user ini di array 'users' (dipakai untuk update)
+            function findCurrentUserIndex(users, emailKey) {
+                return users.findIndex(u => u.email && u.email.toLowerCase() === emailKey);
+            }
+
+            // UPLOAD & SIMPAN FOTO (Konversi ke Base64 / Text)
+            const uploadInput = document.getElementById("upload-avatar");
+            uploadInput.addEventListener("change", function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const base64Image = e.target.result;
+                        avatarPreview.setAttribute("src", base64Image);
+
+                        // Simpan ke currentUser & sinkronkan ke array users
+                        currentUser.photo = base64Image;
+                        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                        const users = getUsers();
+                        const idx = findCurrentUserIndex(users, currentUser.email.toLowerCase());
+                        if (idx !== -1) {
+                            users[idx].photo = base64Image;
+                            saveUsers(users);
+                        }
+
+                        // Perbarui navbar secara live
+                        try {
+                            window.parent.document.querySelector('.frame-nav').contentWindow.location.reload();
+                        } catch (err) {}
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // SIMPAN DATA TEXT (Nama, Email, dll)
+            document.getElementById('form-edit-profile').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const newName = document.getElementById('profile-name').value.trim();
+                const newEmail = document.getElementById('profile-email').value.trim();
+                const newPhone = document.getElementById('profile-phone').value.trim();
+                const newNik = document.getElementById('profile-nik').value.trim();
+
+                if (!newName) { alert('Nama wajib diisi!'); return; }
+                if (!newEmail) { alert('Email wajib diisi!'); return; }
+
+                const oldEmailKey = currentUser.email.trim().toLowerCase();
+                const newEmailKey = newEmail.trim().toLowerCase();
+                const users = getUsers();
+
+                // Kalau email diganti, pastikan belum dipakai akun lain
+                if (oldEmailKey !== newEmailKey) {
+                    const emailTaken = users.some(u => u.email && u.email.toLowerCase() === newEmailKey);
+                    if (emailTaken) {
+                        alert('Email tersebut sudah digunakan oleh akun lain!');
+                        return;
+                    }
+                }
+
+                const idx = findCurrentUserIndex(users, oldEmailKey);
+                if (idx !== -1) {
+                    users[idx].name = newName;
+                    users[idx].email = newEmail;
+                    users[idx].phone = newPhone;
+                    users[idx].nik = newNik;
+                    saveUsers(users);
+                    currentUser = users[idx];
+                } else {
+                    // Fallback jika data user tidak ditemukan di array
+                    currentUser.name = newName;
+                    currentUser.email = newEmail;
+                    currentUser.phone = newPhone;
+                    currentUser.nik = newNik;
+                }
+
+                // Simpan session login yang sudah diperbarui
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                alert('Data Profil Berhasil Disimpan!');
+                window.location.reload();
+                window.parent.document.querySelector('.frame-nav').contentWindow.location.reload();
+            });
+
+            // Form Ganti Password
+            document.getElementById('form-change-password').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const current = document.getElementById('current-password').value;
+                const newPass = document.getElementById('new-password').value;
+                const confPass = document.getElementById('confirm-password').value;
+
+                if (current !== currentUser.password) {
+                    alert("Kata sandi saat ini salah!");
+                    return;
+                }
+                if (newPass !== confPass) {
+                    alert("Kata sandi baru dan konfirmasi tidak cocok!");
+                    return;
+                }
+
+                const users = getUsers();
+                const idx = findCurrentUserIndex(users, currentUser.email.toLowerCase());
+                if (idx !== -1) {
+                    users[idx].password = newPass;
+                    saveUsers(users);
+                }
+                currentUser.password = newPass;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                alert("Kata sandi berhasil diperbarui!");
+                closePasswordOverlay();
+            });
+
+            // Animasi Scroll Reveal
+            const reveals = document.querySelectorAll(".scroll-reveal");
+            const obs = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) {
+                        entry.target.classList.add("active");
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.05 });
+            reveals.forEach(el => obs.observe(el));
+        });
+
+        /* Logika Logout dari halaman Profil */
+        function logoutProfile(e) {
+            if (e) e.preventDefault();
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('currentUser');
+            try {
+                window.parent.document.querySelector('.frame-nav').contentWindow.location.reload();
+            } catch(err) {}
+            window.parent.document.querySelector('.frame-content').src = './pages/home.html';
+        }
+
+        /* Logika Pop-Up Password */
+        function showPasswordOverlay() {
+            document.getElementById('password-overlay').classList.remove('hidden');
+        }
+        function closePasswordOverlay() {
+            document.getElementById('password-overlay').classList.add('hidden');
+            document.getElementById('form-change-password').reset();
+        }
+    </script>
+</body>
+</html>

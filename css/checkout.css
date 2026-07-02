@@ -1,0 +1,451 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --dark-color: #16425e;
+  --bg-card: #ffffff;
+  --text-main: #2c3e50;
+  --text-muted: #7f8c8d;
+  --border-color: #eef2f5;
+  --font-utama: 'Inter', sans-serif;
+  --shadow: 0 4px 20px rgba(0, 81, 139, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-utama);
+}
+
+body {
+  background-color: #f8fafc;
+  color: var(--text-main);
+}
+
+/* COUNTDOWN TIMER BANNER */
+.timer-banner {
+  background-color: #fff1f2;
+  border-bottom: 1px solid #fecdd3;
+  color: #e11d48;
+  padding: 12px 20px;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+#countdown-clock {
+  font-weight: 800;
+  background-color: #e11d48;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+
+/* LAYOUT STRUCTURE */
+.checkout-container {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 1fr 420px; /* Lebar Sidebar Summary dibuat proporsional */
+  gap: 30px;
+  align-items: start;
+}
+
+/* LEFT CONTENT SECTIONS */
+.checkout-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.checkout-section {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 14px;
+}
+
+.step-num {
+  background-color: var(--primary-color);
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.section-title h2 {
+  font-size: 1.25rem;
+  color: var(--dark-color);
+  font-weight: 700;
+}
+
+/* FORM FIELDS STYLING */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.form-group input {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.form-group input:focus:not(:disabled) {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+}
+
+.form-group input:disabled {
+  background-color: #f1f5f9;
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.input-helper {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* STEP 2: CUSTOM VISITOR & CHECKBOX */
+.visitor-notice {
+  margin-bottom: 20px;
+}
+
+.checkbox-container {
+  display: block;
+  position: relative;
+  padding-left: 28px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #334155;
+  user-select: none;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.checkmark {
+  position: absolute;
+  top: 1px;
+  left: 0;
+  height: 18px;
+  width: 18px;
+  background-color: #e2e8f0;
+  border-radius: 4px;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: var(--secondary-color);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 4px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.visitor-card {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.visitor-card h4 {
+  font-size: 0.9rem;
+  color: var(--dark-color);
+  margin-bottom: 14px;
+}
+
+/* STEP 3: METODE PEMBAYARAN OPTIONS */
+.payment-group {
+  margin-bottom: 24px;
+}
+
+.payment-group h3 {
+  font-size: 0.95rem;
+  color: #475569;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.payment-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.payment-card-option {
+  cursor: pointer;
+  display: block;
+}
+
+.payment-card-option input {
+  position: absolute;
+  opacity: 0;
+}
+
+.payment-card-content {
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.2s;
+}
+
+.bank-logo {
+  height: 24px;
+  max-width: 70px;
+  object-fit: contain;
+}
+
+.payment-card-content span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* State Aktif saat Radio Button dipilih */
+.payment-card-option input:checked + .payment-card-content {
+  border-color: var(--primary-color);
+  background-color: rgba(52, 152, 219, 0.03);
+}
+
+/* RIGHT COLUMN: STICKY ORDER SUMMARY        */
+.checkout-sidebar-summary {
+  position: sticky;
+  top: 80px; /* Sesuai margin tinggi banner di atas */
+}
+
+.summary-box {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+}
+
+.summary-box h3 {
+  font-size: 1.15rem;
+  color: var(--dark-color);
+  margin-bottom: 18px;
+  font-weight: 700;
+}
+
+.event-mini-card {
+  display: flex;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 16px;
+}
+
+.event-mini-card img {
+  width: 90px;
+  height: 65px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.event-mini-details h4 {
+  font-size: 0.95rem;
+  color: var(--dark-color);
+  margin-bottom: 4px;
+}
+
+.event-mini-details p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.order-items-list {
+  padding-bottom: 16px;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.order-item-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+/* Promo Voucher Box */
+.promo-box {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0;
+}
+
+.promo-box input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.btn-promo {
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-promo:hover {
+  background-color: #e2e8f0;
+}
+
+/* Price Breakdown details */
+.price-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.breakdown-row.discount {
+  color: var(--secondary-color);
+  font-weight: 500;
+}
+
+.total-row {
+  border-top: 1px solid var(--border-color);
+  padding-top: 14px;
+  margin-top: 4px;
+  color: var(--dark-color);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.final-price {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #e11d48; /* Warna merah premium untuk total nominal */
+}
+
+.legal-text {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 16px;
+}
+
+.legal-text a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+/* CTA PAY BUTTON */
+.btn-checkout-pay {
+  width: 100%;
+  background-color: var(--secondary-color);
+  color: #fff;
+  border: none;
+  padding: 15px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
+  transition: all 0.2s;
+}
+
+.btn-checkout-pay:hover {
+  background-color: #27ae60;
+  transform: translateY(-1px);
+}
+
+/* ANIMATION INTERSECTION OBSERVER SYSTEM    */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* RESPONSIVE LAYOUT BREAKPOINTS             */
+@media (max-width: 992px) {
+  .checkout-container { grid-template-columns: 1fr; gap: 24px; }
+  .checkout-sidebar-summary { position: relative; top: 0; }
+}
+
+@media (max-width: 600px) {
+  .form-grid, .payment-options { grid-template-columns: 1fr; }
+  .checkout-section { padding: 20px; }
+}

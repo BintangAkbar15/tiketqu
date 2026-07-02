@@ -1,0 +1,269 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --dark-color: #16425e;
+  --bg-card: #ffffff;
+  --text-main: #2c3e50;
+  --text-muted: #7f8c8d;
+  --border-color: #eef2f5;
+  --font-utama: 'Inter', sans-serif;
+  --shadow: 0 4px 20px rgba(0, 81, 139, 0.05);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-utama);
+}
+
+body {
+  background-color: #f8fafc;
+  color: var(--text-main);
+}
+
+.profile-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 280px 1fr; /* Sidebar statis kiri, form luas kanan */
+  gap: 30px;
+  align-items: start;
+  margin-bottom: 80px;
+}
+
+/* SIDEBAR LEFT MANAGEMENT PANEL             */
+.profile-sidebar {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 30px 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.user-avatar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.avatar-image {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  margin-bottom: 14px;
+  box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+}
+
+.avatar-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.btn-change-avatar {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background-color: var(--primary-color);
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: background-color 0.2s;
+}
+.btn-change-avatar:hover { background-color: #2980b9; }
+
+.profile-sidebar h3 {
+  font-size: 1.1rem;
+  color: var(--dark-color);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.user-role-tag {
+  font-size: 0.75rem;
+  background-color: #f1f5f9;
+  color: #475569;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+/* Navigasi Link Menu internal */
+.profile-menu-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.menu-link {
+  display: block;
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: #475569;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.menu-link:hover {
+  background-color: #f8fafc;
+  color: var(--primary-color);
+}
+
+.menu-link.active {
+  background-color: rgba(52, 152, 219, 0.08);
+  color: var(--primary-color);
+}
+
+.menu-link.text-danger {
+  color: #e11d48;
+}
+.menu-link.text-danger:hover {
+  background-color: #fff1f2;
+}
+
+
+/* MAIN CONTENT PANEL (FORMS BOX)            */
+
+.profile-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.profile-card-section {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
+}
+
+.card-header-title {
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 14px;
+}
+
+.card-header-title h2 {
+  font-size: 1.2rem;
+  color: var(--dark-color);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.card-header-title p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Form Grid Fields Layout */
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group.grid-span-2 {
+  grid-column: span 2;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.form-group input {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  outline: none;
+  background-color: #fff;
+  transition: all 0.2s;
+}
+
+.form-group input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.12);
+}
+
+/* Action CTA Simpan */
+.form-action-wrapper {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-save-profile, .btn-update-password {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-update-password {
+  background-color: #475569; /* Warna abu gelap netral untuk pembeda area keamanan */
+}
+
+.btn-save-profile:hover, .btn-update-password:hover {
+  opacity: 0.9;
+}
+
+/* ANIMATION EFFECTS                         */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* SCREEN RESPONSIVE CAPABILITIES            */
+@media (max-width: 850px) {
+  .profile-container { grid-template-columns: 1fr; gap: 24px; }
+  .profile-sidebar { text-align: left; }
+  .user-avatar-wrapper { flex-direction: row; gap: 20px; align-items: center; justify-content: flex-start; }
+  .profile-menu-links { flex-direction: row; flex-wrap: wrap; }
+  .menu-link { padding: 8px 12px; font-size: 0.85rem; }
+}
+
+@media (max-width: 600px) {
+  .profile-form-grid { grid-template-columns: 1fr; }
+  .form-group.grid-span-2 { grid-column: span 1; }
+  .profile-card-section { padding: 20px; }
+}

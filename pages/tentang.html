@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tentang Kami - Tiketqu</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        .tentang-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px 80px 20px;
+        }
+
+        /* ===== HERO ===== */
+        .tentang-hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .tentang-hero .tag {
+            display: inline-block;
+            background: rgba(52,152,219,0.1);
+            color: #3498db;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+        }
+        .tentang-hero h1 {
+            font-size: 2.2rem;
+            color: #16425e;
+            margin: 0 0 14px 0;
+        }
+        .tentang-hero p {
+            max-width: 640px;
+            margin: 0 auto;
+            color: #555;
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        /* ===== VIDEO ===== */
+        .tentang-video-box {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 18px;
+            overflow: hidden;
+            background: #0d2436;
+            box-shadow: 0 12px 30px rgba(22,66,94,0.25);
+            margin: 36px 0 60px 0;
+        }
+        .tentang-video-box video,
+        .tentang-video-box iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+            object-fit: cover;
+        }
+        .video-caption {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 10px;
+        }
+        .video-controls {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            display: flex;
+            gap: 10px;
+            z-index: 5;
+        }
+        .video-controls button {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0,0,0,0.55);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: background 0.2s, transform 0.2s;
+        }
+        .video-controls button:hover {
+            background: rgba(52,152,219,0.9);
+            transform: scale(1.06);
+        }
+        .video-controls button .material-icons {
+            font-size: 22px;
+        }
+
+        /* ===== SECTION UMUM ===== */
+        .tentang-section {
+            margin-bottom: 60px;
+        }
+        .section-heading {
+            text-align: center;
+            margin-bottom: 34px;
+        }
+        .section-heading h2 {
+            font-size: 1.6rem;
+            color: #16425e;
+            margin: 0 0 8px 0;
+        }
+        .section-heading p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* ===== CERITA / MISI ===== */
+        .story-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        .story-grid .story-text p {
+            color: #444;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+        .story-grid .story-image {
+            background: linear-gradient(135deg, #3498db, #16425e);
+            border-radius: 18px;
+            min-height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+        .story-grid .story-image .material-icons {
+            font-size: 90px;
+            opacity: 0.85;
+        }
+
+        /* ===== STATISTIK ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        .stat-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 16px;
+            padding: 26px 16px;
+            text-align: center;
+            box-shadow: 0 4px 14px rgba(0,81,139,0.06);
+        }
+        .stat-card .stat-num {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #3498db;
+            display: block;
+        }
+        .stat-card .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        /* ===== FITUR ===== */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .feature-card {
+            display: flex;
+            gap: 16px;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 4px 14px rgba(0,81,139,0.06);
+        }
+        .feature-card .icon-wrap {
+            flex-shrink: 0;
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: rgba(52,152,219,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .feature-card .icon-wrap .material-icons { color: #3498db; }
+        .feature-card h4 {
+            margin: 0 0 6px 0;
+            color: #16425e;
+            font-size: 1rem;
+        }
+        .feature-card p {
+            margin: 0;
+            color: #666;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        /* ===== CTA ===== */
+        .tentang-cta {
+            text-align: center;
+            background: linear-gradient(135deg, #16425e, #3498db);
+            border-radius: 20px;
+            padding: 50px 30px;
+            color: #fff;
+        }
+        .tentang-cta h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+        }
+        .tentang-cta p {
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+        .tentang-cta button {
+            background: #fff;
+            color: #16425e;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+        .tentang-cta button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+        }
+
+        /* ===== SCROLL REVEAL ===== */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .scroll-reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 800px) {
+            .story-grid, .feature-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        iframe{
+            width: 100%;
+            height: 370px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="tentang-wrapper">
+
+        <!-- HERO -->
+        <div class="tentang-hero scroll-reveal">
+            <span class="tag">TENTANG KAMI</span>
+            <h1>Mengenal Lebih Dekat Tiketqu</h1>
+            <p>Tiketqu hadir untuk membuat pemesanan tiket event mulai dari konser musik, seminar, workshop, hingga pameran jadi lebih mudah, cepat, dan terpercaya, langsung dari genggaman tanganmu.</p>
+        </div>
+
+        <!-- VIDEO -->
+        <div class="scroll-reveal">
+            <div class="tentang-video-box">
+                
+                <video id="tentang-video" autoplay muted loop playsinline>
+                    <source src="../assets/video/0701.mp4" type="video/mp4">
+                    Browser kamu tidak mendukung pemutaran video.
+                </video>
+
+                <!-- Kontrol manual: mute/unmute & stop -->
+                <div class="video-controls">
+                    <button type="button" id="btn-toggle-sound" title="Aktifkan / Matikan Suara">
+                        <span class="material-icons" id="icon-sound">volume_off</span>
+                    </button>
+                    <button type="button" id="btn-stop-video" title="Hentikan Video">
+                        <span class="material-icons">stop</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CERITA / MISI -->
+        <section class="tentang-section scroll-reveal">
+            <div class="section-heading">
+                <h2>Cerita & Misi Kami</h2>
+                <p>Kenapa Tiketqu dibuat, dan apa yang kami perjuangkan</p>
+            </div>
+            <div class="story-grid">
+                <div class="story-text">
+                    <p><strong>Tiketqu</strong> adalah platform pemesanan tiket acara secara online yang memudahkan pengguna untuk mencari, memilih, dan membeli tiket berbagai jenis event hanya dalam beberapa langkah sederhana.</p>
+                    <p>Kami percaya bahwa proses membeli tiket seharusnya tidak ribet: tanpa antre panjang, tanpa takut kehabisan, dan tanpa kekhawatiran tiket palsu. Karena itu, kami membangun sistem yang transparan, cepat, dan aman untuk penyelenggara maupun pembeli tiket.</p>
+                    <p>Melalui Tiketqu, pengguna dapat menjelajahi katalog event terbaru, melihat detail lengkap setiap acara (tanggal, lokasi, dan kategori tiket), melakukan pemesanan lewat halaman checkout, serta memantau status transaksi dan e-tiket langsung dari halaman "Pesanan Saya".</p>
+                </div>
+                <div class="story-image">
+                    <span class="material-icons">confirmation_number</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- STATISTIK -->
+        <section class="tentang-section scroll-reveal">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-num">500+</span>
+                    <span class="stat-label">Event Terdaftar</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num">50K+</span>
+                    <span class="stat-label">Pengguna Aktif</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num">120+</span>
+                    <span class="stat-label">Kota Terjangkau</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-num">98%</span>
+                    <span class="stat-label">Kepuasan Pengguna</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- FITUR UTAMA -->
+        <section class="tentang-section scroll-reveal">
+            <div class="section-heading">
+                <h2>Fitur Utama</h2>
+                <p>Semua yang kamu butuhkan untuk urusan tiket event</p>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon-wrap"><span class="material-icons">event</span></div>
+                    <div>
+                        <h4>Katalog Event Lengkap</h4>
+                        <p>Ribuan pilihan event dari berbagai kategori, terus diperbarui setiap hari.</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-wrap"><span class="material-icons">shopping_cart</span></div>
+                    <div>
+                        <h4>Keranjang Belanja</h4>
+                        <p>Beli beberapa tiket dari event berbeda sekaligus dalam satu kali checkout.</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-wrap"><span class="material-icons">receipt_long</span></div>
+                    <div>
+                        <h4>Riwayat & Status Transaksi</h4>
+                        <p>Pantau status pembayaran dan e-tiket kapan saja langsung dari akunmu.</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <div class="icon-wrap"><span class="material-icons">account_circle</span></div>
+                    <div>
+                        <h4>Data Pemesanan Otomatis</h4>
+                        <p>Profil tersimpan membuat proses checkout jadi lebih cepat tanpa isi ulang data.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="tentang-cta scroll-reveal">
+            <h2>Siap Menemukan Event Favoritmu?</h2>
+            <p>Jelajahi katalog event kami dan dapatkan tiketnya sekarang juga.</p>
+            <button onclick="window.parent.document.querySelector('.frame-content').src='./pages/katalog.html'">Lihat Katalog Event</button>
+        </section>
+
+    </div>
+
+    
+    <iframe src="../component/footer.html" title="footer" class="frame-footer" scrolling="no"></iframe>
+
+    <script>
+        /* ============ VIDEO: AUTOPLAY, VOLUME KECIL, LOOP, & STOP MANUAL ============ */
+        (function () {
+            const video = document.getElementById('tentang-video');
+            const btnSound = document.getElementById('btn-toggle-sound');
+            const iconSound = document.getElementById('icon-sound');
+            const btnStop = document.getElementById('btn-stop-video');
+            const VOLUME_KECIL = 1; // 15%, biar tidak mengagetkan
+            let stopped = false;
+
+            if (video) {
+                video.volume = VOLUME_KECIL;
+
+                // Browser hanya mengizinkan autoplay bila video dimulai dalam kondisi muted.
+                // Setelah mulai berjalan, kita coba nyalakan suara kecil secara otomatis.
+                video.play().catch(() => { /* diabaikan jika browser tetap memblokir */ });
+
+                video.addEventListener('playing', function tryUnmute() {
+                    video.muted = false;
+                    video.volume = VOLUME_KECIL;
+                    iconSound.textContent = video.muted ? 'volume_off' : 'volume_up';
+                    video.removeEventListener('playing', tryUnmute);
+                });
+
+                // Toggle suara manual
+                btnSound.addEventListener('click', function () {
+                    video.muted = !video.muted;
+                    if (!video.muted) video.volume = VOLUME_KECIL;
+                    iconSound.textContent = video.muted ? 'volume_off' : 'volume_up';
+                });
+
+                // Tombol stop: hentikan video sepenuhnya (pause + kembali ke awal)
+                btnStop.addEventListener('click', function () {
+                    if (!stopped) {
+                        video.pause();
+                        video.currentTime = 0;
+                        stopped = true;
+                        btnStop.querySelector('.material-icons').textContent = 'play_arrow';
+                        btnStop.title = 'Putar Video';
+                    } else {
+                        video.play();
+                        stopped = false;
+                        btnStop.querySelector('.material-icons').textContent = 'stop';
+                        btnStop.title = 'Hentikan Video';
+                    }
+                });
+            }
+        })();
+
+        const reveals = document.querySelectorAll(".scroll-reveal");
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("active");
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.05 });
+        reveals.forEach(el => obs.observe(el));
+    </script>
+</body>
+</html>

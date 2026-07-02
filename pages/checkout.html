@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Tiketqu</title>
+    <link rel="stylesheet" href="../css/checkout.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        
+        iframe{
+            width: 100%;
+            height: 370px;
+        }
+        
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 30px;
+            align-items: start;
+            max-width: 1200px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .checkout-main-content {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .checkout-sidebar-summary {
+            position: sticky;
+            top: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+            .checkout-sidebar-summary {
+                position: static;
+            }
+        }
+
+        /* Beberapa event-mini-card ditumpuk saat checkout multi-event */
+        .event-mini-card + .event-mini-card {
+            margin-top: 10px;
+        }
+
+        /* Kartu pengunjung tambahan (multi tiket) */
+        .visitor-card + .visitor-card {
+            margin-top: 16px;
+        }
+
+        .checkout-empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+        .checkout-empty-state .material-icons {
+            font-size: 64px;
+            color: #cfd8dc;
+            display: block;
+            margin-bottom: 16px;
+        }
+        .checkout-empty-state a {
+            display: inline-block;
+            margin-top: 14px;
+            background: #3498db;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .promo-message {
+            font-size: 0.8rem;
+            margin-top: 6px;
+        }
+        .promo-message.success { color: #2ecc71; }
+        .promo-message.error { color: #e74c3c; }
+    </style>
+</head>
+<body>
+
+
+    <!-- MAIN CHECKOUT CONTAINER -->
+    <div class="checkout-container" id="checkout-root">
+
+        <!-- KOLOM KIRI: FORMS & PAYMENT -->
+        <div class="checkout-main-content">
+
+            <!-- STEP 1: DATA PEMESAN -->
+            <section class="checkout-section scroll-reveal">
+                <div class="section-title">
+                    <span class="step-num">1</span>
+                    <h2>Informasi Kontak Pemesan</h2>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nama-lengkap">Nama Lengkap (Sesuai KTP)</label>
+                        <input type="text" id="nama-lengkap" placeholder="Contoh: John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Alamat Email</label>
+                        <input type="email" id="email" placeholder="Contoh: johndoe@gmail.com" required>
+                        <span class="input-helper">E-Tiket akan dikirimkan ke email ini</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="no-hp">Nomor Handphone (WhatsApp)</label>
+                        <input type="tel" id="no-hp" placeholder="Contoh: 08123456789" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="no-identitas">Nomor Identitas (NIK KTP / SIM)</label>
+                        <input type="text" id="no-identitas" placeholder="Contoh: 3171XXXXXXXXXXXX" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 2: DATA PENGUNJUNG / TIKET HOLDER -->
+            <section class="checkout-section scroll-reveal">
+                <div class="section-title">
+                    <span class="step-num">2</span>
+                    <h2>Detail Pengunjung</h2>
+                </div>
+                <div class="visitor-notice">
+                    <label class="checkbox-container">Data pengunjung sama dengan data pemesan di atas
+                        <input type="checkbox" id="same-as-buyer" checked>
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <!-- Form ini dikloning secara dinamis via JS sesuai jumlah tiket -->
+                <div id="visitor-forms-container">
+                </div>
+            </section>
+
+            <!-- STEP 3: METODE PEMBAYARAN -->
+            <section class="checkout-section scroll-reveal">
+                <div class="section-title">
+                    <span class="step-num">3</span>
+                    <h2>Pilih Metode Pembayaran</h2>
+                </div>
+
+                <div class="payment-methods-wrapper">
+                    <!-- Kelompok Virtual Account -->
+                    <div class="payment-group">
+                        <h3>Virtual Account (Dicek Otomatis)</h3>
+                        <div class="payment-options">
+                            <label class="payment-card-option">
+                                <input type="radio" name="payment_method" value="bca_va" checked>
+                                <div class="payment-card-content">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Bank_Central_Asia.svg" alt="BCA" class="bank-logo">
+                                    <span>BCA Virtual Account</span>
+                                </div>
+                            </label>
+                            <label class="payment-card-option">
+                                <input type="radio" name="payment_method" value="mandiri_va">
+                                <div class="payment-card-content">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Bank_Mandiri_logo_2016.svg" alt="Mandiri" class="bank-logo">
+                                    <span>Mandiri Virtual Account</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Kelompok E-Wallet -->
+                    <div class="payment-group">
+                        <h3>E-Wallet & QRIS</h3>
+                        <div class="payment-options">
+                            <label class="payment-card-option">
+                                <input type="radio" name="payment_method" value="qris">
+                                <div class="payment-card-content">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS" class="bank-logo">
+                                    <span>QRIS (Gopay, OVO, Dana, LinkAja)</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- KOLOM KANAN: RINGKASAN ORDER (Sticky Sidebar) -->
+        <aside class="checkout-sidebar-summary">
+            <div class="summary-box scroll-reveal">
+                <h3>Detail Pesanan</h3>
+
+                <!-- Info Mini Event (bisa lebih dari 1 jika multi-event) -->
+                <div id="event-mini-list">
+                </div>
+
+                <!-- Detail Item Rincian -->
+                <div class="order-items-list" id="order-items-list">
+                </div>
+
+                <!-- Input Kode Promo -->
+                <div class="promo-box">
+                    <input type="text" id="promo-input" placeholder="Masukkan kode promo/diskon">
+                    <button class="btn-promo" id="btn-promo">Terapkan</button>
+                </div>
+                <div class="promo-message" id="promo-message"></div>
+
+                <!-- Breakdown Rincian Harga -->
+                <div class="price-breakdown">
+                    <div class="breakdown-row">
+                        <span>Subtotal</span>
+                        <span id="breakdown-subtotal">Rp 0</span>
+                    </div>
+                    <div class="breakdown-row">
+                        <span>Biaya Layanan & Pajak</span>
+                        <span id="breakdown-fee">Rp 5.000</span>
+                    </div>
+                    <div class="breakdown-row discount">
+                        <span>Potongan Promo</span>
+                        <span id="breakdown-discount">-Rp 0</span>
+                    </div>
+                    <div class="breakdown-row total-row">
+                        <span>Total Pembayaran</span>
+                        <span class="final-price" id="breakdown-total">Rp 0</span>
+                    </div>
+                </div>
+
+                <!-- Kebijakan Privasi & CTA Button -->
+                <p class="legal-text">Dengan mengklik tombol di bawah, Anda menyetujui <a href="#">Syarat & Ketentuan</a> serta <a href="#">Kebijakan Privasi</a> Tiketqu.</p>
+
+                <button class="btn-checkout-pay" id="btn-pay">Bayar Sekarang &rarr;</button>
+            </div>
+        </aside>
+
+    </div>
+
+    
+    <iframe src="../component/footer.html" title="footer" class="frame-footer" scrolling="no"></iframe>
+
+    <!-- SCRIPT LOGIKA COUNTDOWN & INTERAKTIF -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            /* ============ SCROLL REVEAL ============ */
+            function initScrollReveal() {
+                const reveals = document.querySelectorAll(".scroll-reveal");
+                const obs = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("active");
+                            obs.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.05 });
+                reveals.forEach(el => obs.observe(el));
+            }
+
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            function formatDate(dateString) {
+                const d = new Date(dateString);
+                if (isNaN(d.getTime())) return dateString;
+                return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+            }
+            function formatRupiah(num) {
+                return "Rp " + Number(num).toLocaleString('id-ID');
+            }
+
+            /* ============ AMBIL DATA CHECKOUT DARI LOCALSTORAGE ============ */
+            const checkoutItems = JSON.parse(localStorage.getItem('checkoutSekarang')) || [];
+
+            if (checkoutItems.length === 0) {
+                document.getElementById('checkout-root').innerHTML = `
+                    <div class="checkout-empty-state" style="grid-column: 1 / -1;">
+                        <span class="material-icons">receipt_long</span>
+                        <p>Tidak ada item untuk di-checkout.</p>
+                        <a href="keranjang.html">Kembali ke Keranjang</a>
+                    </div>
+                `;
+                return;
+            }
+
+            /* ============ AUTO-ISI DATA PEMESAN DARI AKUN YANG SEDANG LOGIN ============ */
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+
+            if (isLoggedIn && currentUser) {
+                document.getElementById('nama-lengkap').value = currentUser.name || '';
+                document.getElementById('email').value = currentUser.email || '';
+                document.getElementById('no-hp').value = currentUser.phone || '';
+                document.getElementById('no-identitas').value = currentUser.nik || '';
+            }
+
+            const BIAYA_LAYANAN = 5000;
+            const PROMO_CODES = {
+                "TIKETQU10": 0.10 // diskon 10%
+            };
+            let discountAmount = 0;
+
+            /* ============ RENDER EVENT MINI CARD & RINCIAN ITEM ============ */
+            const miniListEl = document.getElementById('event-mini-list');
+            const itemsListEl = document.getElementById('order-items-list');
+
+            miniListEl.innerHTML = checkoutItems.map(item => `
+                <div class="event-mini-card">
+                    <img src="${item.gambar}" alt="${item.nama_acara}">
+                    <div class="event-mini-details">
+                        <h4>${item.nama_acara}</h4>
+                        <p class="txt-date"><span class="material-icons" style="font-size:16px;vertical-align:text-bottom;">calendar_today</span> ${formatDate(item.tanggal)}</p>
+                        <p class="txt-loc"><span class="material-icons" style="font-size:16px;vertical-align:text-bottom;">location_on</span> ${item.lokasi}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            itemsListEl.innerHTML = checkoutItems.map(item => `
+                <div class="order-item-row">
+                    <span>${item.nama_acara} (x${item.qty})</span>
+                    <span>${formatRupiah(item.harga_satuan * item.qty)}</span>
+                </div>
+            `).join('');
+
+            /* ============ VISITOR FORMS (1 form per tiket) ============ */
+            const visitorContainer = document.getElementById('visitor-forms-container');
+
+            function buildVisitorForms() {
+                let html = '';
+                let ticketNumber = 0;
+                checkoutItems.forEach(item => {
+                    for (let i = 0; i < item.qty; i++) {
+                        ticketNumber++;
+                        html += `
+                            <div class="visitor-card">
+                                <h4>Tiket ${ticketNumber}: ${item.nama_acara}</h4>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Nama Lengkap Pengunjung</label>
+                                        <input type="text" class="input-visitor-name" value="" disabled>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Nomor Identitas (NIK)</label>
+                                        <input type="text" class="input-visitor-id" value="" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                visitorContainer.innerHTML = html;
+            }
+            buildVisitorForms();
+
+            /* ============ PRICE BREAKDOWN ============ */
+            function updateBreakdown() {
+                const subtotal = checkoutItems.reduce((sum, item) => sum + (item.harga_satuan * item.qty), 0);
+                const total = Math.max(subtotal + BIAYA_LAYANAN - discountAmount, 0);
+
+                document.getElementById('breakdown-subtotal').innerText = formatRupiah(subtotal);
+                document.getElementById('breakdown-fee').innerText = formatRupiah(BIAYA_LAYANAN);
+                document.getElementById('breakdown-discount').innerText = "-" + formatRupiah(discountAmount);
+                document.getElementById('breakdown-total').innerText = formatRupiah(total);
+
+                return { subtotal, biayaLayanan: BIAYA_LAYANAN, diskon: discountAmount, total };
+            }
+            updateBreakdown();
+
+            /* ============ PROMO CODE ============ */
+            document.getElementById('btn-promo').addEventListener('click', function () {
+                const input = document.getElementById('promo-input');
+                const msgEl = document.getElementById('promo-message');
+                const code = input.value.trim().toUpperCase();
+                const subtotal = checkoutItems.reduce((sum, item) => sum + (item.harga_satuan * item.qty), 0);
+
+                if (PROMO_CODES[code]) {
+                    discountAmount = Math.round(subtotal * PROMO_CODES[code]);
+                    msgEl.textContent = `Kode promo "${code}" berhasil diterapkan!`;
+                    msgEl.className = "promo-message success";
+                } else {
+                    discountAmount = 0;
+                    msgEl.textContent = "Kode promo tidak valid.";
+                    msgEl.className = "promo-message error";
+                }
+                updateBreakdown();
+            });
+
+            /* ============ SINKRONISASI CHECKBOX DATA PEMESAN KE PENGUNJUNG ============ */
+            const checkboxSame = document.getElementById("same-as-buyer");
+            const buyerNameInput = document.getElementById("nama-lengkap");
+            const buyerIdInput = document.getElementById("no-identitas");
+
+            function syncVisitorFields() {
+                const visitorNameInputs = document.querySelectorAll(".input-visitor-name");
+                const visitorIdInputs = document.querySelectorAll(".input-visitor-id");
+
+                if (checkboxSame.checked) {
+                    visitorNameInputs.forEach(inp => { inp.value = buyerNameInput.value; inp.disabled = true; });
+                    visitorIdInputs.forEach(inp => { inp.value = buyerIdInput.value; inp.disabled = true; });
+                } else {
+                    visitorNameInputs.forEach(inp => { inp.disabled = false; });
+                    visitorIdInputs.forEach(inp => { inp.disabled = false; });
+                }
+            }
+
+            checkboxSame.addEventListener("change", syncVisitorFields);
+            buyerNameInput.addEventListener("input", function () {
+                if (checkboxSame.checked) {
+                    document.querySelectorAll(".input-visitor-name").forEach(inp => inp.value = this.value);
+                }
+            });
+            buyerIdInput.addEventListener("input", function () {
+                if (checkboxSame.checked) {
+                    document.querySelectorAll(".input-visitor-id").forEach(inp => inp.value = this.value);
+                }
+            });
+            syncVisitorFields();
+
+
+            /* ============ SUBMIT / BAYAR SEKARANG ============ */
+            document.getElementById('btn-pay').addEventListener('click', function () {
+                const nama = buyerNameInput.value.trim();
+                const email = document.getElementById('email').value.trim();
+                const noHp = document.getElementById('no-hp').value.trim();
+                const noIdentitas = buyerIdInput.value.trim();
+
+                if (!nama || !email || !noHp || !noIdentitas) {
+                    alert("Mohon lengkapi data kontak pemesan terlebih dahulu.");
+                    return;
+                }
+
+                if (!checkboxSame.checked) {
+                    const visitorNames = document.querySelectorAll(".input-visitor-name");
+                    const visitorIds = document.querySelectorAll(".input-visitor-id");
+                    for (let i = 0; i < visitorNames.length; i++) {
+                        if (!visitorNames[i].value.trim() || !visitorIds[i].value.trim()) {
+                            alert("Mohon lengkapi seluruh data pengunjung tiket.");
+                            return;
+                        }
+                    }
+                }
+
+                const metodePembayaran = document.querySelector('input[name="payment_method"]:checked').value;
+                const breakdown = updateBreakdown();
+
+                const order = {
+                    orderId: 'ORD-' + Date.now(),
+                    items: checkoutItems,
+                    buyer: { nama, email, noHp, noIdentitas },
+                    metodePembayaran,
+                    subtotal: breakdown.subtotal,
+                    biayaLayanan: breakdown.biayaLayanan,
+                    diskon: breakdown.diskon,
+                    totalBayar: breakdown.total,
+                    status: 'unpaid',
+                    createdAt: Date.now(),
+                    deadline: Date.now() + (15 * 60 * 1000)
+                };
+
+                // Simpan ke daftar pesanan
+                let pesanan = JSON.parse(localStorage.getItem('pesananUser')) || [];
+                pesanan.push(order);
+                localStorage.setItem('pesananUser', JSON.stringify(pesanan));
+
+                // Hapus item yang sudah di-checkout dari keranjang (jika ada di sana)
+                const checkedOutIds = new Set(checkoutItems.map(i => i.cartItemId));
+                let keranjang = JSON.parse(localStorage.getItem('keranjangUser')) || [];
+                keranjang = keranjang.filter(i => !checkedOutIds.has(i.cartItemId));
+                localStorage.setItem('keranjangUser', JSON.stringify(keranjang));
+
+                // Bersihkan data checkout sementara & hentikan timer
+                localStorage.removeItem('checkoutSekarang');
+
+                alert("Pesanan berhasil dibuat! Silakan selesaikan pembayaran di halaman Pesanan Saya.");
+                window.location.href = "tickets.html";
+            });
+
+            initScrollReveal();
+        });
+    </script>
+</body>
+</html>

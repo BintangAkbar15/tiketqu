@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* ... (Semua CSS sama persis dengan yang ada sebelumnya, biarkan default style.css bekerja) ... */
+        body { background: transparent; }
+        header { display: block; background: transparent; }
+        nav { background: var(--bg-color); box-shadow: var(--shadow); will-change: box-shadow; transform: translateZ(0); }
+        .material-icons { vertical-align: middle; }
+        .burger-menu { display: none; cursor: pointer; }
+        .burger-menu .material-icons { font-size: 30px; color: var(--dark-color); }
+        
+        .sidebar { position: fixed; top: 0; right: -300px; width: 250px; height: 100%; background: white; z-index: 10000; transition: 0.3s; padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+        .sidebar.active { right: 0; }
+        .sidebar .close-btn { font-size: 30px; cursor: pointer; text-align: right; margin-bottom: 20px; color: var(--dark-color); }
+        .sidebar a { display: flex; align-items: center; gap: 10px; padding: 15px 0; text-decoration: none; color: var(--text-color); font-weight: 600; cursor: pointer; }
+        .sidebar a:hover { color: var(--primary-color); }
+        
+        .profile-section { text-align: center; padding: 10px 0 20px 0; }
+        .profile-section img { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; border: 3px solid var(--primary-color); padding: 2px; object-fit: cover;}
+
+        .profile { position: relative; }
+        .profile .img { cursor: pointer; }
+        .profile .img img { object-fit: cover; }
+        
+        .dropdown-menu { position: absolute; top: 55px; right: 0; background: white; border-radius: 10px; box-shadow: 0 4px 14px rgba(0, 81, 139, 0.15); width: 220px; display: flex; flex-direction: column; overflow: hidden; z-index: 1000; transition: all 0.3s ease; opacity: 0; visibility: hidden; transform: translateY(-10px); }
+        .dropdown-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown-menu a { padding: 12px 20px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-color); font-size: var(--fs-sm); font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        .dropdown-menu a:hover { background: #f9f9f9; color: var(--primary-color); }
+        .dropdown-menu hr { margin: 0; border: 0; border-top: 1px solid #eee; }
+        .dropdown-menu .text-danger { color: #e74c3c; }
+        .dropdown-menu .text-danger:hover { color: #c0392b; background: #fdf2f0; }
+
+        @media (max-width: 768px) { .desktop-only { display: none !important; } .burger-menu { display: block; } nav { padding: 0 20px; } }
+    </style>
+</head>
+<body>
+    <header>
+    <nav>
+        <div class="logo" onclick="navigate('./pages/home.html', 'nav-dashboard')">
+            <div class="img">
+                <img src="../assets/img/logo_BA.png" alt="" style="height: 40px;">
+            </div>
+            <label class="text-color-primary">Tiketqu<span>.com</span></label>
+        </div>
+
+        <div class="burger-menu" onclick="toggleSidebar()">
+            <span class="material-icons">menu</span>
+        </div>
+
+        <div class="navigation desktop-only">
+            <ul>
+                <li id="nav-dashboard" onclick="navigate('./pages/home.html', 'nav-dashboard')"><label>Dashboard</label></li>
+                <li id="nav-katalog" onclick="navigate('./pages/katalog.html', 'nav-katalog')"><label>Katalog</label></li>
+                <li id="nav-tentang" onclick="navigate('./pages/tentang.html', 'nav-tentang')"><label>Tentang Kami</label></li>
+            </ul>
+        </div>
+        
+        <div class="profile_login desktop-only">
+            <div id="user-profile" class="profile" style="display: none;">
+                <label id="username-display"></label>
+                <div class="img" onclick="toggleDropdown(event)">
+                    <img id="nav-avatar-img" src="../assets/img/default-avatar.png" alt="Profile">
+                </div>
+                
+                <div id="profile-dropdown" class="dropdown-menu">
+                    <a onclick="navigate('./pages/profil.html', ''); toggleDropdown(event);"><span class="material-icons">person</span> Profil Saya</a>
+                    <a onclick="navigate('./pages/keranjang.html', ''); toggleDropdown(event);"><span class="material-icons">shopping_cart</span> Keranjang</a>
+                    <a onclick="navigate('./pages/tickets.html', ''); toggleDropdown(event);"><span class="material-icons">local_activity</span> Tiket Saya</a>
+                    <hr>
+                    <a onclick="logout()" class="text-danger"><span class="material-icons">logout</span> Keluar</a>
+                </div>
+            </div>
+            
+            <div id="auth-buttons" class="login_register">
+                <button class="remove-bg text-color-primary" onclick="window.parent.showAuth('login')">Masuk</button>
+                <button class="bg-primary no-border text-color-light" onclick="window.parent.showAuth('register')">Daftar</button>
+            </div>
+        </div>
+    </nav>
+    </header>
+
+    <div id="sidebar-menu" class="sidebar">
+        <div class="close-btn" onclick="toggleSidebar()">&times;</div>
+        <div id="sidebar-content"></div>
+    </div>
+
+    <script>
+        // Menandai menu navigasi (Dashboard/Katalog/Tentang Kami) mana yang
+        // sedang aktif berdasarkan halaman yang benar-benar tampil di
+        // frame-content. Kalau tidak dikenali (misal baru pertama kali
+        // dibuka), default-nya jatuh ke Dashboard.
+        function setActiveNavItem() {
+            const pageToNavId = {
+                'home.html': 'nav-dashboard',
+                'katalog.html': 'nav-katalog',
+                'tentang.html': 'nav-tentang'
+            };
+
+            let currentFile = 'home.html'; // fallback default: Dashboard
+            try {
+                const contentFrame = window.parent.document.getElementById('content-frame')
+                    || window.parent.document.querySelector('.frame-content');
+                const src = contentFrame ? contentFrame.getAttribute('src') : '';
+                if (src) currentFile = src.split('/').pop().split('?')[0].split('#')[0];
+            } catch (e) {}
+
+            const activeId = pageToNavId[currentFile] || 'nav-dashboard';
+
+            ['nav-dashboard', 'nav-katalog', 'nav-tentang'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            });
+            const target = document.getElementById(activeId);
+            if (target) target.classList.add('active');
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar-menu');
+            sidebar.classList.toggle('active');
+            try {
+                const navFrame = window.parent.document.querySelector('.frame-nav');
+                navFrame.style.height = sidebar.classList.contains('active') ? '100vh' : '100px';
+            } catch(e) {}
+        }
+
+        function toggleDropdown(event) {
+            event.stopPropagation(); 
+            const dropdown = document.getElementById('profile-dropdown');
+            dropdown.classList.toggle('show');
+            try {
+                const navFrame = window.parent.document.querySelector('.frame-nav');
+                navFrame.style.height = dropdown.classList.contains('show') ? '300px' : '100px';
+            } catch(e) {}
+        }
+
+        window.onclick = function(event) {
+            const dropdown = document.getElementById('profile-dropdown');
+            if (dropdown && dropdown.classList.contains('show') && !event.target.closest('.profile')) {
+                dropdown.classList.remove('show');
+                try { window.parent.document.querySelector('.frame-nav').style.height = '100px'; } catch(e) {}
+            }
+        }
+
+        function navigate(pagePath, elementId) {
+            if (pagePath !== '') window.parent.document.querySelector('.frame-content').src = pagePath;
+            ['nav-dashboard', 'nav-katalog', 'nav-tentang'].forEach(id => {
+                if(document.getElementById(id)) document.getElementById(id).classList.remove('active');
+            });
+            if (elementId !== '' && document.getElementById(elementId)) document.getElementById(elementId).classList.add('active');
+            
+            const sidebar = document.getElementById('sidebar-menu');
+            if(sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                try { window.parent.document.querySelector('.frame-nav').style.height = '100px'; } catch(e) {}
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('currentUser');
+            window.parent.document.querySelector('.frame-content').src = './pages/home.html';
+            window.location.reload();
+        }
+
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        const currentUsername = currentUser ? currentUser.name : 'Pengguna';
+        // Ambil Foto dari data user. Jika belum ada field 'photo', gunakan default
+        const savedPic = (currentUser && currentUser.photo) ? currentUser.photo : '../assets/img/image.png';
+        
+        const userProfileDesktop = document.getElementById('user-profile');
+        const authButtonsDesktop = document.getElementById('auth-buttons');
+        const usernameDisplay = document.getElementById('username-display');
+        const navAvatarImg = document.getElementById('nav-avatar-img');
+        const sidebar = document.getElementById('sidebar-content');
+        
+        if (usernameDisplay) {
+            usernameDisplay.innerText = currentUsername;
+            navAvatarImg.src = savedPic; // Pasang foto
+        }
+
+        // Set menu aktif sesuai halaman yang sedang tampil (default: Dashboard)
+        setActiveNavItem();
+        
+        if (isLoggedIn) {
+            userProfileDesktop.style.display = 'flex';
+            authButtonsDesktop.style.display = 'none';
+
+            sidebar.innerHTML = `
+                <div class="profile-section">
+                    <img src="${savedPic}" alt="Profile" style="object-fit:cover;">
+                    <h3>${currentUsername}</h3>
+                </div>
+                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ddd;">
+                <a onclick="navigate('./pages/profil.html', '')"><span class="material-icons">person</span> Profil Saya</a>
+                <a onclick="navigate('./pages/keranjang.html', '')"><span class="material-icons">shopping_cart</span> Keranjang</a>
+                <a onclick="navigate('./pages/tickets.html', '')"><span class="material-icons">local_activity</span> Tiket Saya</a>
+                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ddd;">
+                <a onclick="navigate('./pages/home.html', 'nav-dashboard')"><span class="material-icons">dashboard</span> Dashboard</a>
+                <a onclick="navigate('./pages/katalog.html', 'nav-katalog')"><span class="material-icons">list</span> Katalog</a>
+                <a onclick="navigate('', 'nav-tentang')"><span class="material-icons">info</span> Tentang Kami</a>
+                <a onclick="logout()" style="color: #e74c3c; margin-top: 20px;"><span class="material-icons">logout</span> Keluar</a>
+            `;
+        } else {
+            userProfileDesktop.style.display = 'none';
+            authButtonsDesktop.style.display = 'flex';
+
+            sidebar.innerHTML = `
+                <a onclick="window.parent.showAuth('login'); toggleSidebar();"><span class="material-icons">login</span> Masuk</a>
+                <a onclick="window.parent.showAuth('register'); toggleSidebar();"><span class="material-icons">person_add</span> Daftar</a>
+                <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ddd;">
+                <a onclick="navigate('./pages/home.html', 'nav-dashboard')"><span class="material-icons">dashboard</span> Dashboard</a>
+                <a onclick="navigate('./pages/katalog.html', 'nav-katalog')"><span class="material-icons">list</span> Katalog</a>
+                <a onclick="navigate('', 'nav-tentang')"><span class="material-icons">info</span> Tentang Kami</a>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesanan Saya - Tiketqu</title>
+    <link rel="stylesheet" href="../css/tiket.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        /* BASE & EXISTING STYLES                    */
+        .orders-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* TABEL RINGKASAN TRANSAKSI */
+        .table-transaksi-wrapper {
+            overflow-x: auto;
+            margin-bottom: 30px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        .table-transaksi-wrapper h3 {
+            padding: 16px 20px 0 20px;
+            font-size: 1.05rem;
+            color: #16425e;
+        }
+        table.tabel-transaksi {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        table.tabel-transaksi thead th {
+            background: #f2f7fb;
+            color: #16425e;
+            text-align: left;
+            padding: 12px 16px;
+            font-weight: 700;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        table.tabel-transaksi tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+        table.tabel-transaksi tbody tr:last-child td { border-bottom: none; }
+        table.tabel-transaksi tbody tr:hover { background: #fafafa; }
+        
+        .status-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .status-pill.unpaid { background: #fdecea; color: #e74c3c; }
+        .status-pill.upcoming { background: #eafaf1; color: #27ae60; }
+        .status-pill.completed { background: #eef1f3; color: #7f8c8d; }
+
+        @media (max-width: 600px) {
+            table.tabel-transaksi { font-size: 0.8rem; }
+            table.tabel-transaksi thead th, table.tabel-transaksi tbody td { padding: 8px 10px; }
+        }
+
+        .dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .btn-dots {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #475569;
+            padding: 4px;
+            border-radius: 50%;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-dots:hover {
+            background-color: #f1f5f9;
+        }
+
+        #global-dropdown-menu {
+            display: none;
+            position: fixed; /* KUNCI: lepas dari alur dokumen manapun, jadi tidak pernah terpotong */
+            background-color: #fff;
+            min-width: 170px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+            border-radius: 10px;
+            z-index: 10000;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        #global-dropdown-menu.show {
+            display: block;
+        }
+
+        #global-dropdown-menu .dropdown-item {
+            width: 100%;
+            text-align: left;
+            padding: 10px 16px;
+            background: none;
+            border: none;
+            font-size: 0.85rem;
+            color: #334155;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+
+        #global-dropdown-menu .dropdown-item .material-icons {
+            font-size: 18px;
+        }
+
+        #global-dropdown-menu .dropdown-item:hover {
+            background-color: #f8fafc;
+            color: #3498db;
+        }
+
+        #global-dropdown-menu .dropdown-item.text-danger:hover {
+            color: #e11d48;
+            background-color: #fef2f2;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        
+        /* MODAL POP-UP STYLES                       */
+        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease forwards;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Modal detail: menampilkan ringkasan transaksi (bukan lagi order-card) */
+        #modal-detail .modal-content {
+            max-width: 640px;
+        }
+        #modal-detail .modal-body {
+            background: #f8fafc;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h4 {
+            margin: 0;
+            font-size: 1.1rem;
+            color: #16425e;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        
+        /* DETAIL TRANSAKSI (pengganti order-card di dalam modal) */
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e2e8f0;
+            font-size: 0.88rem;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-row .detail-label { color: #64748b; font-weight: 600; }
+        .detail-row .detail-value { color: #16425e; text-align: right; }
+        .detail-items {
+            margin-top: 6px;
+            padding-top: 6px;
+        }
+        .detail-items .detail-item-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            padding: 4px 0;
+            color: #334155;
+        }
+        .detail-total {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            color: #16425e;
+        }
+        .detail-actions {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        /* QR Placeholder untuk E-Tiket */
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            background: #f1f5f9;
+            border: 2px dashed #cbd5e1;
+            margin: 0 auto 16px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            flex-direction: column;
+            color: #64748b;
+        }
+        
+        iframe{
+            width: 100%;
+            height: 370px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="orders-container">
+        <nav class="orders-tabs scroll-reveal">
+            <button class="tab-btn active" data-status="all">Semua</button>
+            <button class="tab-btn" data-status="unpaid">Belum Bayar <span class="tab-badge" id="badge-unpaid">0</span></button>
+            <button class="tab-btn" data-status="upcoming">Event Tersedia</button>
+            <button class="tab-btn" data-status="completed">Selesai</button>
+        </nav>
+
+        <div class="search-orders-box scroll-reveal">
+            <span class="search-icon material-icons">search</span>
+            <input type="text" id="order-search" placeholder="Kamu bisa mencari berdasarkan Nama Acara, Penyelenggara, atau No. Invoice...">
+        </div>
+
+        <div class="table-transaksi-wrapper scroll-reveal">
+            <h3>Ringkasan Transaksi</h3>
+            <table class="tabel-transaksi">
+                <thead>
+                    <tr>
+                        <th>No. Invoice</th>
+                        <th>Nama Transaksi (Acara)</th>
+                        <th>Jumlah</th>
+                        <th>Kategori</th>
+                        <th>Total Bayar</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="table-transaksi-body">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="dropdown-menu" id="global-dropdown-menu">
+        <button class="dropdown-item action-detail">
+            <span class="material-icons">visibility</span> Lihat Detail
+        </button>
+        <button class="dropdown-item action-edit">
+            <span class="material-icons">edit</span> Edit
+        </button>
+        <button class="dropdown-item action-hapus text-danger">
+            <span class="material-icons">delete</span> Hapus
+        </button>
+    </div>
+
+    <div class="modal-overlay" id="modal-detail">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Detail Transaksi</h4>
+                <button class="btn-close material-icons" onclick="closeModal('modal-detail')">close</button>
+            </div>
+            <div class="modal-body" id="detail-body-content">
+                </div>
+            <div class="modal-footer">
+                <button class="btn-secondary-action" onclick="closeModal('modal-detail')">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-edit">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Edit Pesanan</h4>
+                <button class="btn-close material-icons" onclick="closeModal('modal-edit')">close</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.85rem; color:#666; margin-bottom:16px;">Ubah detail pesananmu sebelum melakukan pembayaran.</p>
+                <div class="form-group">
+                    <label>Nama Pemesan</label>
+                    <input type="text" id="edit-nama" placeholder="Masukkan nama pemesan">
+                </div>
+                <div class="form-group">
+                    <label>Email Pemesan</label>
+                    <input type="email" id="edit-email" placeholder="contoh@email.com">
+                </div>
+                <input type="hidden" id="edit-order-id">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary-action" onclick="closeModal('modal-edit')">Batal</button>
+                <button class="btn-primary-action" onclick="saveEditOrder()">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-tiket">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>E-Tiket Anda</h4>
+                <button class="btn-close material-icons" onclick="closeModal('modal-tiket')">close</button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <div class="qr-placeholder">
+                    <span class="material-icons" style="font-size: 64px;">qr_code_2</span>
+                    <span style="font-size: 0.8rem; margin-top: 8px;">Valid untuk masuk</span>
+                </div>
+                <h3 id="tiket-event-name" style="margin-bottom: 4px; color:#16425e;">Nama Acara</h3>
+                <p id="tiket-order-id" style="font-size: 0.85rem; color:#7f8c8d; margin-bottom: 16px;">INV-12345</p>
+                <p style="font-size: 0.85rem; color:#475569;">Tunjukkan QR code ini kepada petugas di pintu masuk acara.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary-action" onclick="closeModal('modal-tiket')">Unduh Tiket</button>
+            </div>
+        </div>
+    </div>
+
+
+    <iframe src="../component/footer.html" title="footer" class="frame-footer" scrolling="no"></iframe>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            /* SCROLL REVEAL */
+            function initScrollReveal() {
+                const reveals = document.querySelectorAll(".scroll-reveal");
+                const obs = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("active");
+                            obs.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.02 });
+                reveals.forEach(el => obs.observe(el));
+            }
+
+            const dayNames = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
+            function formatFullDate(dateString) {
+                const d = new Date(dateString);
+                if (isNaN(d.getTime())) return dateString;
+                return `${dayNames[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+            }
+            function formatRupiah(num) {
+                return "Rp " + Number(num).toLocaleString('id-ID');
+            }
+
+            const searchInput = document.getElementById('order-search');
+            const tabs = document.querySelectorAll(".tab-btn");
+            let activeTab = 'all';
+
+            /* DATA LAYER */
+            function getOrders() {
+                return JSON.parse(localStorage.getItem('pesananUser')) || [];
+            }
+            function saveOrders(orders) {
+                localStorage.setItem('pesananUser', JSON.stringify(orders));
+            }
+
+            const statusLabel = {
+                unpaid: { text: 'Belum Bayar', cls: 'text-danger' },
+                upcoming: { text: 'Tiket Aktif (Mendatang)', cls: 'text-success' },
+                completed: { text: 'Selesai', cls: 'text-muted' }
+            };
+
+            /* RENDER TABEL RINGKASAN TRANSAKSI (DENGAN AKSI) */
+            function renderTable(orders) {
+                const tbody = document.getElementById('table-transaksi-body');
+                if (!orders.length) {
+                    const semuaOrders = getOrders();
+                    const pesan = semuaOrders.length === 0
+                        ? 'Kamu belum memiliki pesanan apapun.'
+                        : 'Tidak ada transaksi pada kategori ini.';
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 24px; color:#888;">${pesan}</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = orders.map(order => {
+                    const namaTransaksi = order.items.map(i => i.nama_acara).join(', ');
+                    const jumlahTiket = order.items.reduce((sum, i) => sum + Number(i.qty || 0), 0);
+                    const kategori = order.items.map(i => i.tipe_event || '-').join(', ');
+                    
+                    let aksiHTML = '';
+                    
+                    if (order.status === 'unpaid') {
+                        // Jika belum dibayar, tampilkan tombol 3 titik (kebab menu)
+                        // Menu-nya sendiri adalah elemen global (#global-dropdown-menu)
+                        // yang posisinya dihitung ulang tiap kali tombol ini diklik.
+                        aksiHTML = `
+                            <div class="dropdown-container">
+                                <button class="btn-dots" data-order="${order.orderId}" onclick="toggleDropdown(this)">
+                                    <span class="material-icons">more_vert</span>
+                                </button>
+                            </div>
+                        `;
+                    } else if (order.status === 'upcoming') {
+                        // Jika event tersedia, tampilkan tombol lihat tiket
+                        aksiHTML = `
+                            <button class="btn-primary-action btn-sm action-tiket" data-order="${order.orderId}">
+                                Lihat Tiket
+                            </button>
+                        `;
+                    } else {
+                        // Jika selesai
+                        aksiHTML = `<span class="status-pill completed">Selesai</span>`;
+                    }
+
+                    return `
+                        <tr>
+                            <td>${order.orderId}</td>
+                            <td>${namaTransaksi}</td>
+                            <td>${jumlahTiket}</td>
+                            <td>${kategori}</td>
+                            <td>${formatRupiah(order.totalBayar)}</td>
+                            <td>${aksiHTML}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            /* DETAIL TRANSAKSI (dipakai di dalam modal, menggantikan order-card) */
+            function buildDetailHTML(order) {
+                const label = statusLabel[order.status] || { text: order.status, cls: '' };
+                const itemsHTML = order.items.map(item => `
+                    <div class="detail-item-line">
+                        <span>${item.nama_acara}${item.tipe_event ? ' · ' + item.tipe_event : ''} (x${item.qty || 0})</span>
+                        <span>${formatRupiah((item.harga || 0) * (item.qty || 0))}</span>
+                    </div>
+                `).join('');
+
+                let actionsHTML = '';
+                if (order.status === 'unpaid') {
+                    actionsHTML = `
+                        <div class="detail-actions">
+                            <button class="btn-secondary-action cancel-order" data-order-id="${order.orderId}">Batalkan</button>
+                            <button class="btn-primary-action pay-now" data-order-id="${order.orderId}">Bayar Sekarang</button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="detail-row">
+                        <span class="detail-label">No. Invoice</span>
+                        <span class="detail-value">${order.orderId}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value ${label.cls}">${label.text}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Nama Pemesan</span>
+                        <span class="detail-value">${order.buyer?.nama || '-'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email Pemesan</span>
+                        <span class="detail-value">${order.buyer?.email || '-'}</span>
+                    </div>
+                    <div class="detail-items">
+                        ${itemsHTML}
+                    </div>
+                    <div class="detail-total">
+                        <span>Total Bayar</span>
+                        <span>${formatRupiah(order.totalBayar)}</span>
+                    </div>
+                    ${actionsHTML}
+                `;
+            }
+
+            /* RENDER (TABEL SAJA, MENGIKUTI TAB AKTIF) */
+            function render() {
+                let orders = getOrders();
+                let changed = false;
+                orders = orders.filter(order => {
+                    if (order.status === 'unpaid' && order.deadline && Date.now() > order.deadline) {
+                        changed = true;
+                        return false; 
+                    }
+                    return true;
+                });
+                if (changed) saveOrders(orders);
+
+                const unpaidCount = orders.filter(o => o.status === 'unpaid').length;
+                const badgeUnpaidEl = document.getElementById('badge-unpaid');
+                badgeUnpaidEl.innerText = unpaidCount;
+                badgeUnpaidEl.style.display = unpaidCount > 0 ? '' : 'none';
+
+                // Data tabel mengikuti tab yang sedang aktif (Semua / Belum Bayar / Event Tersedia / Selesai)
+                let filtered = activeTab === 'all' ? orders : orders.filter(o => o.status === activeTab);
+                const keyword = searchInput.value.trim().toLowerCase();
+                if (keyword) {
+                    filtered = filtered.filter(order => {
+                        const inOrderId = order.orderId.toLowerCase().includes(keyword);
+                        const inItems = order.items.some(item =>
+                            item.nama_acara.toLowerCase().includes(keyword) ||
+                            (item.penyelenggara || '').toLowerCase().includes(keyword)
+                        );
+                        return inOrderId || inItems;
+                    });
+                }
+
+                renderTable(filtered);
+                initScrollReveal();
+            }
+
+            /* TAB FILTER */
+            tabs.forEach(tab => {
+                tab.addEventListener("click", function () {
+                    tabs.forEach(t => t.classList.remove("active"));
+                    this.classList.add("active");
+                    activeTab = this.getAttribute("data-status");
+                    render();
+                });
+            });
+
+            /* SEARCH */
+            searchInput.addEventListener("input", function () { render(); });
+
+            
+            /* EVENT DELEGATION: DROPDOWN & MODAL ACTION */
+            
+
+            // Menu dropdown tunggal (global), posisinya dihitung dari tombol yang diklik
+            const globalDropdown = document.getElementById('global-dropdown-menu');
+
+            window.toggleDropdown = function (btn) {
+                const orderId = btn.getAttribute('data-order');
+                const alreadyOpenForThis = globalDropdown.classList.contains('show') &&
+                    globalDropdown.getAttribute('data-order') === orderId;
+
+                globalDropdown.classList.remove('show');
+                if (alreadyOpenForThis) return; // klik tombol yang sama = tutup
+
+                globalDropdown.setAttribute('data-order', orderId);
+
+                // Hitung posisi tombol relatif terhadap viewport (bukan terhadap container),
+                // sehingga menu selalu tampil penuh, tidak terpotong overflow tabel/card.
+                const rect = btn.getBoundingClientRect();
+                const menuWidth = 180;
+                let left = rect.right - menuWidth;
+                let top = rect.bottom + 6;
+
+                if (left < 8) left = 8;
+                if (left + menuWidth > window.innerWidth - 8) left = window.innerWidth - menuWidth - 8;
+
+                const estimatedMenuHeight = 160;
+                // Jika menu akan keluar dari bawah layar, tampilkan di ATAS tombol
+                if (top + estimatedMenuHeight > window.innerHeight - 8) {
+                    top = rect.top - estimatedMenuHeight - 6;
+                }
+
+                globalDropdown.style.left = left + 'px';
+                globalDropdown.style.top = top + 'px';
+                globalDropdown.classList.add('show');
+            };
+
+            // Menutup menu jika klik di luar area, saat scroll, atau saat resize
+            window.onclick = function (event) {
+                if (!event.target.closest('.btn-dots') && !event.target.closest('#global-dropdown-menu')) {
+                    globalDropdown.classList.remove('show');
+                }
+            };
+            window.addEventListener('scroll', () => globalDropdown.classList.remove('show'), true);
+            window.addEventListener('resize', () => globalDropdown.classList.remove('show'));
+            // Delegasi untuk Aksi pada Tabel & Card (Lihat Detail, Edit, Hapus, Lihat Tiket)
+            document.body.addEventListener("click", function (e) {
+                // Aksi Hapus (dipicu dari menu dropdown 3 titik di tabel)
+                if (e.target.closest(".action-hapus")) {
+                    const orderId = globalDropdown.getAttribute("data-order");
+                    if (orderId && confirm(`Yakin ingin menghapus pesanan ${orderId}?`)) {
+                        let orders = getOrders();
+                        orders = orders.filter(o => o.orderId !== orderId);
+                        saveOrders(orders);
+                        render();
+                    }
+                    globalDropdown.classList.remove('show');
+                }
+
+                // Aksi Lihat Detail -> tampilkan detail transaksi di dalam modal
+                // (dipicu dari menu dropdown 3 titik di tabel)
+                if (e.target.closest(".action-detail")) {
+                    const btnDetail = e.target.closest(".action-detail");
+                    const orderId = btnDetail.getAttribute("data-order") || globalDropdown.getAttribute("data-order");
+                    const order = getOrders().find(o => o.orderId === orderId);
+                    if (order) {
+                        document.getElementById('detail-body-content').innerHTML = buildDetailHTML(order);
+                        openModal('modal-detail');
+                    }
+                    globalDropdown.classList.remove('show');
+                }
+
+                // Aksi Edit (dipicu dari menu dropdown 3 titik di tabel)
+                if (e.target.closest(".action-edit")) {
+                    const orderId = globalDropdown.getAttribute("data-order");
+                    const order = getOrders().find(o => o.orderId === orderId);
+                    document.getElementById('edit-order-id').value = orderId || "";
+                    // Prefill dengan data pemesan yang sudah ada, bukan dikosongkan
+                    document.getElementById('edit-nama').value = order?.buyer?.nama || "";
+                    document.getElementById('edit-email').value = order?.buyer?.email || "";
+                    openModal('modal-edit');
+                    globalDropdown.classList.remove('show');
+                }
+
+                // Aksi Lihat Tiket
+                if (e.target.closest(".action-tiket")) {
+                    const orderId = e.target.closest(".action-tiket").getAttribute("data-order");
+                    const order = getOrders().find(o => o.orderId === orderId);
+                    if (order) {
+                        const namaAcara = order.items.map(i => i.nama_acara).join(', ');
+                        document.getElementById('tiket-event-name').innerText = namaAcara;
+                        document.getElementById('tiket-order-id').innerText = orderId;
+                        openModal('modal-tiket');
+                    }
+                }
+
+                // Aksi Bayar (Di Card, termasuk saat card tampil di dalam modal detail)
+                const payBtn = e.target.closest(".pay-now");
+                if (payBtn) {
+                    const orderId = payBtn.getAttribute("data-order-id");
+                    let orders = getOrders();
+                    const order = orders.find(o => o.orderId === orderId);
+                    if (order) {
+                        order.status = 'upcoming';
+                        delete order.deadline;
+                        saveOrders(orders);
+                        alert("Pembayaran berhasil disimulasikan! Tiketmu sudah aktif.");
+                        closeModal('modal-detail');
+                        render();
+                    }
+                }
+
+                // Aksi Batal (Di Card, termasuk saat card tampil di dalam modal detail)
+                const cancelBtn = e.target.closest(".cancel-order");
+                if (cancelBtn) {
+                    const orderId = cancelBtn.getAttribute("data-order-id");
+                    if (!confirm("Yakin ingin membatalkan pesanan ini?")) return;
+                    let orders = getOrders();
+                    orders = orders.filter(o => o.orderId !== orderId);
+                    saveOrders(orders);
+                    closeModal('modal-detail');
+                    render();
+                }
+            });
+
+            // Global Fungsi Modal
+            window.openModal = function(modalId) {
+                document.getElementById(modalId).classList.add('active');
+            }
+
+            window.closeModal = function(modalId) {
+                document.getElementById(modalId).classList.remove('active');
+            }
+
+            window.saveEditOrder = function() {
+                const orderId = document.getElementById('edit-order-id').value;
+                const newName = document.getElementById('edit-nama').value.trim();
+                const newEmail = document.getElementById('edit-email').value.trim();
+
+                if (newName === "") {
+                    alert("Nama tidak boleh kosong!");
+                    return;
+                }
+                if (newEmail === "") {
+                    alert("Email tidak boleh kosong!");
+                    return;
+                }
+
+                // Simpan perubahan ke data pesanan di localStorage
+                let orders = getOrders();
+                const order = orders.find(o => o.orderId === orderId);
+                if (order) {
+                    order.buyer = order.buyer || {};
+                    order.buyer.nama = newName;
+                    order.buyer.email = newEmail;
+                    saveOrders(orders);
+                }
+
+                alert(`Pesanan ${orderId} berhasil diperbarui atas nama ${newName}.`);
+                closeModal('modal-edit');
+                render();
+            }
+
+            initScrollReveal();
+            render();
+        });
+    </script>
+</body>
+</html>

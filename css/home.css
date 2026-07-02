@@ -1,0 +1,459 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+/* Global CSS */
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --dark-color: #16425e;
+  --bg-color: #ffffff;
+  --font-utama: 'Inter', 'Segoe UI', sans-serif;
+  --shadow: 0 4px 14px rgba(0, 81, 139, 0.105);
+  
+  /* Ukuran Font Tambahan */
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.25rem;
+  --fs-3xl: 1.875rem;
+  --fs-4xl: 2.25rem;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: var(--font-utama);
+}
+
+body {
+  background-color: #fafbfc; 
+}
+
+::-webkit-scrollbar {
+  display: none;           
+}
+
+
+/* HERO SECTION (EVENT BACKGROUND)           */
+
+.hero-section {
+    position: relative;
+    width: 100%;
+    min-height: 550px;
+    /* Menggunakan placeholder gambar event teknologi */
+    background: url('https://picsum.photos/seed/1/1200/600') center/cover no-repeat;
+    padding: 100px 100px 180px 100px; 
+    color: white;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Overlay gelap agar teks kontras dan terbaca */
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(22, 66, 94, 0.85), rgba(0, 0, 0, 0.4));
+    z-index: 1;
+}
+
+.hero-content {
+    max-width: 650px;
+    position: relative;
+    z-index: 2;
+}
+
+.badge-event {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.hero-content h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 1.3;
+    color: white;
+    margin-bottom: 15px;
+}
+
+.highlight-text {
+    color: var(--primary-color); /* Aksen merah lembut untuk highlight */
+    display: inline-block;
+}
+
+.hero-content p {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 25px;
+    max-width: 95%;
+}
+
+.hero-meta {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px 15px;
+    border-radius: 8px;
+    width: fit-content;
+    backdrop-filter: blur(5px);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    padding: 15px 32px;
+    font-size: var(--fs-base);
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+/* Navigasi Panah */
+.nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: #ffffff;
+    font-size: 1.5rem;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.nav-arrow:hover {
+    background: var(--primary-color);
+}
+
+.nav-arrow.left { left: 30px; }
+.nav-arrow.right { right: 30px; }
+
+
+
+/* FLOATING CARDS SECTION (TIPE EVENT)       */
+
+.floating-container {
+    position: relative;
+    max-width: 1200px;
+    margin: -100px auto 50px; 
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: var(--shadow);
+    z-index: 10;
+    opacity: 0;
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section-title-inside h4 {
+    font-size: var(--fs-base);
+    color: var(--dark-color);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+}
+
+.cards-grid {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.card {
+    flex: 1;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 200px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.card:hover img {
+    transform: scale(1.08);
+}
+
+.card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(22, 66, 94, 0.85) 10%, rgba(0,0,0,0.1));
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+}
+
+.card-overlay h3 {
+    color: #ffffff;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.pagination-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 25px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    background-color: #d1d5db;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.dot.active {
+    background-color: var(--primary-color);
+    width: 20px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+
+
+/* ALUR PENGGUNAAN APLIKASI                  */
+
+.how-to-section {
+    padding: 80px 100px;
+    background-color: #fcfcfc;
+}
+
+.how-to-section .section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.how-to-section .section-header h2 {
+    font-size: var(--fs-3xl);
+    color: var(--dark-color);
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.how-to-section .section-header h2 span {
+    color: var(--primary-color);
+}
+
+.how-to-section .section-header p {
+    font-size: var(--fs-base);
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.flow-container {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.flow-container::before {
+    content: '';
+    position: absolute;
+    left: 31px;
+    top: 20px;
+    bottom: 20px;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--primary-color), var(--dark-color));
+    opacity: 0.2;
+}
+
+.flow-step {
+    display: flex;
+    gap: 30px;
+    position: relative;
+    z-index: 2;
+}
+
+.flow-step .step-number {
+    width: 63px;
+    height: 63px;
+    background-color: var(--bg-color);
+    border: 3px solid var(--primary-color);
+    color: var(--dark-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: var(--fs-lg);
+    box-shadow: var(--shadow);
+    flex-shrink: 0;
+}
+
+.flow-step .step-content {
+    background-color: var(--bg-color);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    width: 100%;
+}
+
+.flow-step .step-content h3 {
+    font-size: var(--fs-xl);
+    color: var(--dark-color);
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.flow-step .step-content p {
+    font-size: var(--fs-base);
+    color: #555;
+    line-height: 1.6;
+}
+
+.branch-step .step-number {
+    border-color: var(--dark-color);
+}
+
+.branch-cards {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.branch-card {
+    flex: 1;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid transparent;
+    background-color: #f8fafc;
+}
+
+.branch-card h4 {
+    font-size: var(--fs-base);
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.branch-card.path-a {
+    border-color: var(--primary-color);
+}
+.branch-card.path-a h4 {
+    color: var(--primary-color);
+}
+
+.branch-card.path-b {
+    border-color: var(--secondary-color);
+}
+.branch-card.path-b h4 {
+    color: var(--secondary-color);
+}
+
+.branch-card p {
+    font-size: var(--fs-sm) !important;
+    color: #666;
+}
+
+
+
+/* RESPONSIVE DESIGN                         */
+
+@media (max-width: 768px) {
+    .hero-section { padding: 80px 30px 150px 30px; min-height: 480px; }
+    .hero-content h1 { font-size: 2rem; }
+    .hero-meta { flex-direction: column; gap: 8px; }
+    .cards-grid { flex-direction: column; }
+    .floating-container { margin: -70px 20px 50px; padding: 20px; }
+    .nav-arrow { display: none; } /* Menyembunyikan panah navigasi di mobile layout */
+    
+    .how-to-section { padding: 50px 30px; }
+    .flow-container::before { left: 20px; }
+    .flow-step .step-number { width: 45px; height: 45px; font-size: var(--fs-base); border-width: 2px; }
+    .branch-cards { flex-direction: column; }
+}
+
+
+/* CORE ANIMATION SYSTEM (SCROLL REVEAL)     */
+
+
+/* State Awal: Elemen disembunyikan, diturunkan 30px, dan blur tipis */
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(2px);
+    transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), 
+                transform 0.8s cubic-bezier(0.25, 1, 0.5, 1), 
+                filter 0.6s ease;
+    will-change: transform, opacity; /* Optimalisasi performa GPU browser */
+}
+
+/* State Akhir: Elemen kembali normal saat class 'active' disuntikkan oleh JS */
+.scroll-reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+}
+
+/* Efek Staggered (Berurutan): Berguna untuk grid card agar tidak muncul berbarengan */
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.25s; }
+.reveal-delay-3 { transition-delay: 0.4s; }
+
+/* Animasi Khusus untuk Hero Content (Langsung jalan tanpa nunggu scroll) */
+.hero-content {
+    opacity: 0;
+    transform: translateX(-20px);
+    animation: fadeInLeftHero 1s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes fadeInLeftHero {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}

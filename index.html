@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>tiketqu.com | Beli tiket event mudah dan terpercaya</title>
+  <link rel="icon" type="image/png" href="./assets/img/logo_BA.png">
+  <link rel="stylesheet" href="./css/style.css">
+  <style>
+    body {
+      min-height: 100vh;
+    }
+    ::-webkit-scrollbar{
+      display: none;
+    }
+    .frame-auth {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      z-index: 9999;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <iframe src="./component/navbar.html" title="navbar" class="frame-nav" scrolling="no"></iframe>
+
+  <iframe src="./pages/home.html" title="content" class="frame-content"></iframe>
+
+  <iframe id="auth-frame" src="./component/auth.html" title="auth" class="frame-auth" scrolling="no"></iframe>
+
+
+  <script>
+    // Panggil ini dari navbar.html (window.parent.showAuth(...))
+    function showAuth(type) {
+        const authFrame = document.getElementById('auth-frame');
+        authFrame.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+        // Kirim ke iframe auth.html, form mana yang harus tampil
+        authFrame.contentWindow.postMessage({ action: 'show', type: type }, '*');
+    }
+
+    function closeAuth() {
+        const authFrame = document.getElementById('auth-frame');
+        authFrame.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    function refreshNavbar() {
+        const navIframe = document.querySelector('.frame-nav');
+        if (navIframe) navIframe.contentWindow.location.reload();
+    }
+
+    function refreshContent() {
+        const contentIframe = document.querySelector('.frame-content');
+        if (contentIframe) contentIframe.contentWindow.location.reload();
+    }
+
+    // Terima pesan dari component/auth.html (login/register/close)
+    window.addEventListener('message', (event) => {
+        const data = event.data;
+        if (!data) return;
+
+        if (data.action === 'close') {
+            closeAuth();
+        }
+
+        if (data.action === 'loggedIn') {
+            closeAuth();
+            refreshNavbar();
+            refreshContent();
+        }
+    });
+  </script>
+</body>
+</html>
